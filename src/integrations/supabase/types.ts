@@ -16,34 +16,61 @@ export type Database = {
     Tables: {
       clips: {
         Row: {
+          approval_status: string
+          broll_type: string | null
+          content_type: string
           created_at: string
           event_id: string | null
           file_url: string
           hearted: boolean
           id: string
           note: string | null
+          permission_cleared: boolean
+          player_tags: string[]
+          suggested_event_id: string | null
           team_id: string
+          trim_end: number | null
+          trim_start: number | null
           uploader_name: string | null
+          vibe: string | null
         }
         Insert: {
+          approval_status?: string
+          broll_type?: string | null
+          content_type?: string
           created_at?: string
           event_id?: string | null
           file_url: string
           hearted?: boolean
           id?: string
           note?: string | null
+          permission_cleared?: boolean
+          player_tags?: string[]
+          suggested_event_id?: string | null
           team_id: string
+          trim_end?: number | null
+          trim_start?: number | null
           uploader_name?: string | null
+          vibe?: string | null
         }
         Update: {
+          approval_status?: string
+          broll_type?: string | null
+          content_type?: string
           created_at?: string
           event_id?: string | null
           file_url?: string
           hearted?: boolean
           id?: string
           note?: string | null
+          permission_cleared?: boolean
+          player_tags?: string[]
+          suggested_event_id?: string | null
           team_id?: string
+          trim_end?: number | null
+          trim_start?: number | null
           uploader_name?: string | null
+          vibe?: string | null
         }
         Relationships: [
           {
@@ -66,6 +93,12 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          mix_fan: number
+          mix_full_game: number
+          mix_individual: number
+          mix_team_broll: number
+          recap_type: string
+          render_count: number
           sent_at: string | null
           status: string
           team_id: string
@@ -74,6 +107,12 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          mix_fan?: number
+          mix_full_game?: number
+          mix_individual?: number
+          mix_team_broll?: number
+          recap_type?: string
+          render_count?: number
           sent_at?: string | null
           status?: string
           team_id: string
@@ -82,6 +121,12 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          mix_fan?: number
+          mix_full_game?: number
+          mix_individual?: number
+          mix_team_broll?: number
+          recap_type?: string
+          render_count?: number
           sent_at?: string | null
           status?: string
           team_id?: string
@@ -101,18 +146,27 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          jersey_number: string | null
+          permission_status: string
+          photo_url: string | null
           player_name: string
           team_id: string
         }
         Insert: {
           created_at?: string
           id?: string
+          jersey_number?: string | null
+          permission_status?: string
+          photo_url?: string | null
           player_name: string
           team_id: string
         }
         Update: {
           created_at?: string
           id?: string
+          jersey_number?: string | null
+          permission_status?: string
+          photo_url?: string | null
           player_name?: string
           team_id?: string
         }
@@ -130,25 +184,53 @@ export type Database = {
         Row: {
           created_at: string
           date: string
+          end_date: string | null
+          event_time: string | null
+          event_type: string
           id: string
+          location: string | null
           name: string
+          notes: string | null
+          opponent: string | null
+          parent_id: string | null
           team_id: string
         }
         Insert: {
           created_at?: string
           date: string
+          end_date?: string | null
+          event_time?: string | null
+          event_type?: string
           id?: string
+          location?: string | null
           name: string
+          notes?: string | null
+          opponent?: string | null
+          parent_id?: string | null
           team_id: string
         }
         Update: {
           created_at?: string
           date?: string
+          end_date?: string | null
+          event_time?: string | null
+          event_type?: string
           id?: string
+          location?: string | null
           name?: string
+          notes?: string | null
+          opponent?: string | null
+          parent_id?: string | null
           team_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "schedule_events_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "schedule_events"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "schedule_events_team_id_fkey"
             columns: ["team_id"]

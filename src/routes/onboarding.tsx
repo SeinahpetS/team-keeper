@@ -21,8 +21,8 @@ function Onboarding() {
   const [name, setName] = useState("");
   const [sport, setSport] = useState("");
   const [year, setYear] = useState(new Date().getFullYear());
-  const [events, setEvents] = useState<{ name: string; date: string }[]>([{ name: "", date: "" }]);
-  const [players, setPlayers] = useState<string[]>([""]);
+  const [events, setEvents] = useState<{ name: string; date: string; event_type: string }[]>([{ name: "", date: "", event_type: "game" }]);
+  const [players, setPlayers] = useState<{ name: string; jersey: string }[]>([{ name: "", jersey: "" }]);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -44,11 +44,11 @@ function Onboarding() {
     }
     const validEvents = events.filter((e) => e.name && e.date);
     if (validEvents.length) {
-      await supabase.from("schedule_events").insert(validEvents.map((e) => ({ ...e, team_id: team.id })));
+      await supabase.from("schedule_events").insert(validEvents.map((e) => ({ name: e.name, date: e.date, event_type: e.event_type, team_id: team.id })));
     }
-    const validPlayers = players.filter((p) => p.trim());
+    const validPlayers = players.filter((p) => p.name.trim());
     if (validPlayers.length) {
-      await supabase.from("roster").insert(validPlayers.map((p) => ({ player_name: p.trim(), team_id: team.id })));
+      await supabase.from("roster").insert(validPlayers.map((p) => ({ player_name: p.name.trim(), jersey_number: p.jersey.trim() || null, team_id: team.id })));
     }
     navigate({ to: "/dashboard" });
   };
@@ -85,12 +85,19 @@ function Onboarding() {
               <p className="text-sm text-muted-foreground">Games and events become tags so contributors can label their clips.</p>
               {events.map((ev, i) => (
                 <div key={i} className="flex gap-2">
-                  <Input placeholder="Game vs. Lincoln HS" value={ev.name} onChange={(e) => setEvents(events.map((x, j) => j === i ? { ...x, name: e.target.value } : x))} />
+                  <select className="rounded-md border border-input bg-transparent px-2 py-1 text-sm" value={ev.event_type} onChange={(e) => setEvents(events.map((x, j) => j === i ? { ...x, event_type: e.target.value } : x))}>
+                    <option value="game">Game</option>
+                    <option value="tournament">Tournament</option>
+                    <option value="practice">Practice</option>
+                    <option value="event">Event</option>
+                    <option value="travel">Travel</option>
+                  </select>
+                  <Input className="placeholder:italic placeholder:text-muted-foreground/60" placeholder="Game vs. Lincoln HS" value={ev.name} onChange={(e) => setEvents(events.map((x, j) => j === i ? { ...x, name: e.target.value } : x))} />
                   <Input type="date" value={ev.date} onChange={(e) => setEvents(events.map((x, j) => j === i ? { ...x, date: e.target.value } : x))} />
                   <Button variant="ghost" size="icon" onClick={() => setEvents(events.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
                 </div>
               ))}
-              <Button variant="outline" onClick={() => setEvents([...events, { name: "", date: "" }])}><Plus className="mr-2 h-4 w-4" />Add event</Button>
+              <Button variant="outline" onClick={() => setEvents([...events, { name: "", date: "", event_type: "game" }])}><Plus className="mr-2 h-4 w-4" />Add event</Button>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => setStep(1)} className="flex-1">Back</Button>
                 <Button onClick={() => setStep(3)} className="flex-1" size="lg">Next</Button>
@@ -103,14 +110,15 @@ function Onboarding() {
                 <Users className="h-7 w-7 text-primary" />
                 <h2 className="text-2xl font-bold">Roster</h2>
               </div>
-              <p className="text-sm text-muted-foreground">Player first names — we'll show you who's missing from the reel.</p>
+              <p className="text-sm text-muted-foreground">Player names and jersey numbers — we'll track who's covered all season.</p>
               {players.map((p, i) => (
                 <div key={i} className="flex gap-2">
-                  <Input placeholder="Player name" value={p} onChange={(e) => setPlayers(players.map((x, j) => j === i ? e.target.value : x))} />
+                  <Input className="flex-1 placeholder:italic placeholder:text-muted-foreground/60" placeholder="Player name" value={p.name} onChange={(e) => setPlayers(players.map((x, j) => j === i ? { ...x, name: e.target.value } : x))} />
+                  <Input className="w-24 placeholder:italic placeholder:text-muted-foreground/60" placeholder="#" value={p.jersey} onChange={(e) => setPlayers(players.map((x, j) => j === i ? { ...x, jersey: e.target.value } : x))} />
                   <Button variant="ghost" size="icon" onClick={() => setPlayers(players.filter((_, j) => j !== i))}><X className="h-4 w-4" /></Button>
                 </div>
               ))}
-              <Button variant="outline" onClick={() => setPlayers([...players, ""])}><Plus className="mr-2 h-4 w-4" />Add player</Button>
+              <Button variant="outline" onClick={() => setPlayers([...players, { name: "", jersey: "" }])}><Plus className="mr-2 h-4 w-4" />Add player</Button>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => setStep(2)} className="flex-1">Back</Button>
                 <Button onClick={submit} disabled={busy} className="flex-1" size="lg">{busy ? "Creating..." : "Create team 🎉"}</Button>

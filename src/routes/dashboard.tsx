@@ -1,62 +1,129 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/useAuth";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
-import { Copy, Film, Users, Calendar, Sparkles, LogOut, Image } from "lucide-react";
+import { Copy, Film, Users, AlertCircle, Sparkles, LogOut, Image as ImageIcon, Bell, UserPlus, CalendarPlus, ChevronRight, Trophy, Plane, Dumbbell, PartyPopper, Gamepad2 } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
 });
 
 type Team = { id: string; name: string; sport: string; season_year: number; upload_slug: string };
-type EventRow = { id: string; name: string; date: string };
+type EventRow = {
+  id: string;
+  name: string;
+  date: string;
+  end_date: string | null;
+  event_type: string;
+  parent_id: string | null;
+  location: string | null;
+  event_time: string | null;
+  opponent: string | null;
+  notes: string | null;
+};
+type RosterRow = { id: string; player_name: string; jersey_number: string | null; permission_status: string };
+type ClipRow = { id: string; event_id: string | null; uploader_name: string | null; player_tags: string[]; content_type: string; broll_type: string | null; approval_status: string };
+type RecapRow = { id: string; status: string };
+
+const EVENT_ICON: Record<string, any> = { game: Gamepad2, tournament: Trophy, practice: Dumbbell, event: PartyPopper, travel: Plane };
+
+function healthColor(count: number) {
+  if (count === 0) return "bg-destructive";
+  if (count < 3) return "bg-yellow-500";
+  return "bg-green-500";
+}
 
 function Dashboard() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [team, setTeam] = useState<Team | null>(null);
-  const [events, setEvents] = useState<(EventRow & { count: number })[]>([]);
-  const [stats, setStats] = useState({ clips: 0, contributors: 0, lastUpload: "" });
-  const [compiling, setCompiling] = useState(false);
+  const [events, setEvents] = useState<EventRow[]>([]);
+  const [roster, setRoster] = useState<RosterRow[]>([]);
+  const [clips, setClips] = useState<ClipRow[]>([]);
+  const [recap, setRecap] = useState<RecapRow | null>(null);
+  const [openTournaments, setOpenTournaments] = useState<Record<string, boolean>>({});
+  const [addEventOpen, setAddEventOpen] = useState(false);
+
+  const refresh = async (uid: string) => {
+    const { data: t } = await supabase.from("teams").select("*").eq("admin_id", uid).maybeSingle();
+    if (!t) { navigate({ to: "/onboarding" }); return; }
+    setTeam(t as Team);
+    const [{ data: ev }, { data: r }, { data: c }, { data: rc }] = await Promise.all([
+      supabase.from("schedule_events").select("*").eq("team_id", t.id).order("date"),
+      supabase.from("roster").select("*").eq("team_id", t.id).order("jersey_number"),
+      supabase.from("clips").select("id,event_id,uploader_name,player_tags,content_type,broll_type,approval_status").eq("team_id", t.id),
+      supabase.from("recaps").select("id,status").eq("team_id", t.id).maybeSingle(),
+    ]);
+    setEvents((ev || []) as any);
+    setRoster((r || []) as any);
+    setClips((c || []) as any);
+    setRecap((rc as any) || null);
+  };
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/" });
-    if (!user) return;
-    (async () => {
-      const { data: t } = await supabase.from("teams").select("*").eq("admin_id", user.id).maybeSingle();
-      if (!t) { navigate({ to: "/onboarding" }); return; }
-      setTeam(t as Team);
-      const { data: ev } = await supabase.from("schedule_events").select("*").eq("team_id", t.id).order("date");
-      const { data: clips } = await supabase.from("clips").select("event_id, uploader_name, created_at").eq("team_id", t.id);
-      const counts: Record<string, number> = {};
-      clips?.forEach((c) => { if (c.event_id) counts[c.event_id] = (counts[c.event_id] || 0) + 1; });
-      setEvents((ev || []).map((e) => ({ ...e, count: counts[e.id] || 0 })));
-      setStats({
-        clips: clips?.length || 0,
-        contributors: new Set(clips?.map((c) => c.uploader_name).filter(Boolean)).size,
-        lastUpload: clips?.length ? new Date(Math.max(...clips.map((c) => new Date(c.created_at).getTime()))).toLocaleDateString() : "—",
-      });
-    })();
+    if (user) refresh(user.id);
   }, [user, loading, navigate]);
+
+  const clipsByEvent = useMemo(() => {
+    const m: Record<string, number> = {};
+    clips.forEach((c) => { if (c.event_id) m[c.event_id] = (m[c.event_id] || 0) + 1; });
+    return m;
+  }, [clips]);
+
+  const playersWithFootage = useMemo(() => {
+    const set = new Set<string>();
+    clips.forEach((c) => c.player_tags?.forEach((p) => set.add(p.toLowerCase())));
+    return set;
+  }, [clips]);
+
+  const playersWithMentions = useMemo(() => {
+    // also count name appearing in uploader_name as "has clips but untagged"
+    const set = new Set<string>();
+    clips.forEach((c) => {
+      const text = `${c.uploader_name ?? ""}`.toLowerCase();
+      roster.forEach((p) => { if (text.includes(p.player_name.toLowerCase())) set.add(p.player_name.toLowerCase()); });
+    });
+    return set;
+  }, [clips, roster]);
+
+  const noFootageCount = roster.filter((p) => !playersWithFootage.has(p.player_name.toLowerCase()) && !playersWithMentions.has(p.player_name.toLowerCase())).length;
+  const contributors = new Set(clips.map((c) => c.uploader_name).filter(Boolean)).size;
+
+  const brollClips = clips.filter((c) => c.content_type === "broll");
+  const brollByType = (t: string) => brollClips.filter((c) => c.broll_type === t).length;
+
+  const recapState = (() => {
+    if (!recap) return clips.length >= 5 ? "Enough to compile" : "Not started";
+    if (recap.status === "sent") return "Sent";
+    if (recap.status === "ready") return "Ready to review";
+    if (recap.status === "compiling") return "Compiling";
+    return "Ready to review";
+  })();
 
   const uploadUrl = team ? `${typeof window !== "undefined" ? window.location.origin : ""}/u/${team.upload_slug}` : "";
 
-  const compile = async () => {
-    if (!team) return;
-    setCompiling(true);
-    setTimeout(async () => {
-      const { data: existing } = await supabase.from("recaps").select("id").eq("team_id", team.id).maybeSingle();
-      if (!existing) {
-        await supabase.from("recaps").insert({ team_id: team.id, video_url: "https://www.w3schools.com/html/mov_bbb.mp4", status: "draft" });
-      }
-      navigate({ to: "/recap" });
-    }, 3000);
+  const topLevelEvents = events.filter((e) => !e.parent_id);
+  const childrenOf = (id: string) => events.filter((e) => e.parent_id === id);
+
+  const tournamentClipCount = (tournId: string) => {
+    const childIds = childrenOf(tournId).map((c) => c.id);
+    return (clipsByEvent[tournId] || 0) + childIds.reduce((s, id) => s + (clipsByEvent[id] || 0), 0);
   };
+
+  const sendPoke = () => toast.success("Poke sent to contributors with no submissions 📣");
+  const requestPlayerFootage = (name: string) => toast.success(`Request sent: more footage of ${name}`);
 
   if (!team) return <div className="flex min-h-screen items-center justify-center"><div className="animate-pulse text-muted-foreground">Loading...</div></div>;
 
@@ -74,11 +141,12 @@ function Dashboard() {
       </header>
 
       <div className="mx-auto max-w-6xl space-y-6 px-6 py-8">
+        {/* Upload link */}
         <Card className="overflow-hidden p-0" style={{ boxShadow: "var(--shadow-soft)" }}>
           <div className="grid gap-6 p-6 md:grid-cols-[1fr_auto] md:items-center">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                <Sparkles className="h-3 w-3" /> Share with parents
+                <Sparkles className="h-3 w-3" /> Invite contributors
               </div>
               <h2 className="mt-3 text-2xl font-bold">Your team's upload link</h2>
               <p className="mt-1 text-sm text-muted-foreground">Drop this in your team group chat. No app, no login.</p>
@@ -93,47 +161,246 @@ function Dashboard() {
           </div>
         </Card>
 
+        {/* Stat tiles */}
         <div className="grid gap-4 sm:grid-cols-3">
-          <StatCard icon={Film} label="Clips uploaded" value={stats.clips} />
-          <StatCard icon={Users} label="Contributors" value={stats.contributors} />
-          <StatCard icon={Calendar} label="Last upload" value={stats.lastUpload} />
+          <StatCard icon={Film} label="Clips uploaded" value={clips.length} />
+          <StatCard icon={Users} label="Contributors" value={contributors} />
+          <StatCard icon={AlertCircle} label="Players with no footage" value={noFootageCount} accent={noFootageCount > 0} />
         </div>
 
+        {/* Schedule + Recap status */}
         <div className="grid gap-4 md:grid-cols-2">
           <Card className="p-6">
-            <h3 className="font-semibold">Games & events</h3>
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold">Schedule</h3>
+              <Button variant="ghost" size="sm" onClick={() => setAddEventOpen(true)}><CalendarPlus className="mr-1 h-4 w-4" />Add</Button>
+            </div>
             <div className="mt-4 space-y-2">
-              {events.length === 0 && <p className="text-sm text-muted-foreground">No events yet.</p>}
-              {events.map((e) => (
-                <div key={e.id} className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2">
-                  <div>
-                    <div className="font-medium">{e.name}</div>
-                    <div className="text-xs text-muted-foreground">{new Date(e.date).toLocaleDateString()}</div>
-                  </div>
-                  <span className="text-sm font-semibold text-primary">{e.count} clips</span>
-                </div>
-              ))}
+              {topLevelEvents.length === 0 && <p className="text-sm text-muted-foreground">No entries yet.</p>}
+              {topLevelEvents.map((e) => {
+                const Icon = EVENT_ICON[e.event_type] ?? Gamepad2;
+                if (e.event_type === "tournament") {
+                  const kids = childrenOf(e.id);
+                  const total = tournamentClipCount(e.id);
+                  const open = openTournaments[e.id];
+                  return (
+                    <Collapsible key={e.id} open={open} onOpenChange={(o) => setOpenTournaments({ ...openTournaments, [e.id]: o })}>
+                      <CollapsibleTrigger className="w-full">
+                        <div className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2 hover:bg-muted/70">
+                          <div className="flex items-center gap-2">
+                            <ChevronRight className={`h-4 w-4 transition-transform ${open ? "rotate-90" : ""}`} />
+                            <Icon className="h-4 w-4 text-primary" />
+                            <div className="text-left">
+                              <div className="font-medium">{e.name}</div>
+                              <div className="text-xs text-muted-foreground">{new Date(e.date).toLocaleDateString()}{e.end_date ? ` – ${new Date(e.end_date).toLocaleDateString()}` : ""}</div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className={`h-2 w-2 rounded-full ${healthColor(total)}`} />
+                            <span className="text-sm font-semibold text-primary">{total}</span>
+                          </div>
+                        </div>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="ml-6 mt-1 space-y-1">
+                        {kids.length === 0 && <p className="px-3 py-2 text-xs text-muted-foreground">No nested entries yet.</p>}
+                        {kids.map((k) => <EventRowItem key={k.id} ev={k} count={clipsByEvent[k.id] || 0} />)}
+                      </CollapsibleContent>
+                    </Collapsible>
+                  );
+                }
+                return <EventRowItem key={e.id} ev={e} count={clipsByEvent[e.id] || 0} />;
+              })}
             </div>
           </Card>
-          <Card className="p-6 flex flex-col gap-4">
-            <h3 className="font-semibold">Quick actions</h3>
-            <Link to="/clips"><Button variant="outline" className="w-full justify-start"><Image className="mr-2 h-4 w-4" />View clip pool</Button></Link>
-            <Button onClick={compile} disabled={compiling || stats.clips === 0} size="lg" className="w-full" style={{ background: "var(--gradient-hero)" }}>
-              {compiling ? "Compiling your reel..." : "Compile Recap ✨"}
-            </Button>
-          </Card>
+
+          <div className="space-y-4">
+            <Card className="p-6">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-primary" />
+                <h3 className="font-semibold">Recap status</h3>
+              </div>
+              <div className="mt-3 text-2xl font-bold">{recapState}</div>
+              <p className="mt-1 text-xs text-muted-foreground">Tap to open the compile flow.</p>
+              <Link to="/recap"><Button variant="outline" className="mt-4 w-full">Open recap</Button></Link>
+            </Card>
+
+            <Card className="p-6">
+              <h3 className="font-semibold">Season b-roll</h3>
+              <div className="mt-3 text-2xl font-bold">{brollClips.length}</div>
+              <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                {[
+                  ["Team Sideline", "team_sideline"],
+                  ["Fan Sideline", "fan_sideline"],
+                  ["Team BTS", "team_bts"],
+                  ["Practice", "practice"],
+                ].map(([label, key]) => (
+                  <div key={key} className="flex items-center justify-between rounded bg-muted/40 px-2 py-1">
+                    <span className="text-muted-foreground">{label}</span>
+                    <span className="font-semibold">{brollByType(key)}</span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
         </div>
+
+        {/* Roster coverage */}
+        <Card className="p-6">
+          <h3 className="font-semibold">Roster coverage</h3>
+          <p className="mt-1 text-xs text-muted-foreground">Tap a player to send a focused content request.</p>
+          <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+            {roster.map((p) => {
+              const hasTagged = playersWithFootage.has(p.player_name.toLowerCase());
+              const hasMention = playersWithMentions.has(p.player_name.toLowerCase());
+              const color = hasTagged ? "border-green-500 bg-green-500/10" : hasMention ? "border-yellow-500 bg-yellow-500/10" : "border-destructive bg-destructive/10";
+              return (
+                <button key={p.id} onClick={() => requestPlayerFootage(p.player_name)} className={`flex items-center justify-between rounded-lg border-2 px-3 py-2 text-left text-sm hover:opacity-80 ${color}`}>
+                  <span className="truncate font-medium">{p.player_name}</span>
+                  {p.jersey_number && <span className="ml-2 text-xs text-muted-foreground">#{p.jersey_number}</span>}
+                </button>
+              );
+            })}
+            {roster.length === 0 && <p className="col-span-full text-sm text-muted-foreground">No players yet.</p>}
+          </div>
+        </Card>
+
+        {/* Quick actions */}
+        <Card className="p-6">
+          <h3 className="font-semibold">Quick actions</h3>
+          <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            <Link to="/clips"><Button variant="outline" className="w-full justify-start"><ImageIcon className="mr-2 h-4 w-4" />View clip pool</Button></Link>
+            <Button variant="outline" className="justify-start" onClick={sendPoke}><Bell className="mr-2 h-4 w-4" />Send poke</Button>
+            <Button variant="outline" className="justify-start" onClick={() => toast.info("Pick a player above to request footage")}><UserPlus className="mr-2 h-4 w-4" />Request player footage</Button>
+            <Button variant="outline" className="justify-start" onClick={() => setAddEventOpen(true)}><CalendarPlus className="mr-2 h-4 w-4" />Add schedule entry</Button>
+          </div>
+        </Card>
+      </div>
+
+      <AddEventDialog
+        open={addEventOpen}
+        onOpenChange={setAddEventOpen}
+        teamId={team.id}
+        tournaments={topLevelEvents.filter((e) => e.event_type === "tournament")}
+        onAdded={() => user && refresh(user.id)}
+      />
+    </div>
+  );
+}
+
+function EventRowItem({ ev, count }: { ev: EventRow; count: number }) {
+  const Icon = EVENT_ICON[ev.event_type] ?? Gamepad2;
+  return (
+    <div className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2">
+      <div className="flex items-center gap-2">
+        <Icon className="h-4 w-4 text-primary" />
+        <div>
+          <div className="font-medium">{ev.name}{ev.opponent ? ` vs ${ev.opponent}` : ""}</div>
+          <div className="text-xs text-muted-foreground">{new Date(ev.date).toLocaleDateString()}{ev.event_time ? ` • ${ev.event_time}` : ""}{ev.location ? ` • ${ev.location}` : ""}</div>
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <span className={`h-2 w-2 rounded-full ${healthColor(count)}`} />
+        <span className="text-sm font-semibold text-primary">{count}</span>
       </div>
     </div>
   );
 }
 
-function StatCard({ icon: Icon, label, value }: { icon: any; label: string; value: any }) {
+function StatCard({ icon: Icon, label, value, accent }: { icon: any; label: string; value: any; accent?: boolean }) {
   return (
     <Card className="p-5">
-      <Icon className="h-5 w-5 text-primary" />
+      <Icon className={`h-5 w-5 ${accent ? "text-destructive" : "text-primary"}`} />
       <div className="mt-3 text-2xl font-bold">{value}</div>
       <div className="text-xs text-muted-foreground">{label}</div>
     </Card>
+  );
+}
+
+function AddEventDialog({ open, onOpenChange, teamId, tournaments, onAdded }: { open: boolean; onOpenChange: (b: boolean) => void; teamId: string; tournaments: EventRow[]; onAdded: () => void }) {
+  const [type, setType] = useState("game");
+  const [name, setName] = useState("");
+  const [opponent, setOpponent] = useState("");
+  const [date, setDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [time, setTime] = useState("");
+  const [location, setLocation] = useState("");
+  const [notes, setNotes] = useState("");
+  const [parentId, setParentId] = useState<string>("");
+  const [busy, setBusy] = useState(false);
+
+  const reset = () => { setName(""); setOpponent(""); setDate(""); setEndDate(""); setTime(""); setLocation(""); setNotes(""); setParentId(""); setType("game"); };
+
+  const submit = async () => {
+    if (!name || !date) { toast.error("Name and date required"); return; }
+    setBusy(true);
+    const { error } = await supabase.from("schedule_events").insert({
+      team_id: teamId,
+      event_type: type,
+      name,
+      opponent: opponent || null,
+      date,
+      end_date: endDate || null,
+      event_time: time || null,
+      location: location || null,
+      notes: notes || null,
+      parent_id: parentId || null,
+    });
+    setBusy(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Added");
+    reset();
+    onOpenChange(false);
+    onAdded();
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader><DialogTitle>Add schedule entry</DialogTitle></DialogHeader>
+        <div className="space-y-3">
+          <div className="space-y-1.5">
+            <Label>Type</Label>
+            <Select value={type} onValueChange={setType}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="game">Game</SelectItem>
+                <SelectItem value="tournament">Tournament</SelectItem>
+                <SelectItem value="practice">Practice</SelectItem>
+                <SelectItem value="event">Event</SelectItem>
+                <SelectItem value="travel">Travel</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          {(type === "game" || type === "travel") && tournaments.length > 0 && (
+            <div className="space-y-1.5">
+              <Label>Part of tournament? (optional)</Label>
+              <Select value={parentId || "_none"} onValueChange={(v) => setParentId(v === "_none" ? "" : v)}>
+                <SelectTrigger><SelectValue placeholder="Standalone" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="_none">Standalone</SelectItem>
+                  {tournaments.map((t) => <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          <div className="space-y-1.5"><Label>Name</Label><Input value={name} onChange={(e) => setName(e.target.value)} placeholder={type === "tournament" ? "Spring Classic" : type === "event" ? "Senior Night" : "Home opener"} /></div>
+          {type === "game" && <div className="space-y-1.5"><Label>Opponent</Label><Input value={opponent} onChange={(e) => setOpponent(e.target.value)} placeholder="Lincoln HS" /></div>}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1.5"><Label>{type === "tournament" ? "Start date" : "Date"}</Label><Input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></div>
+            {type === "tournament" ? (
+              <div className="space-y-1.5"><Label>End date</Label><Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} /></div>
+            ) : (
+              <div className="space-y-1.5"><Label>Time</Label><Input value={time} onChange={(e) => setTime(e.target.value)} placeholder="6:00 PM" /></div>
+            )}
+          </div>
+          <div className="space-y-1.5"><Label>Location</Label><Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Home field" /></div>
+          {(type === "practice" || type === "event") && <div className="space-y-1.5"><Label>Notes</Label><Textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} /></div>}
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button onClick={submit} disabled={busy}>{busy ? "Adding..." : "Add"}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

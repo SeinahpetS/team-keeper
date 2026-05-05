@@ -16,6 +16,7 @@ import { Route as ClipsRouteImport } from './routes/clips'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as USlugRouteImport } from './routes/u.$slug'
 import { Route as RSlugRouteImport } from './routes/r.$slug'
+import { Route as URouteImport } from './routes/u.'
 
 const RecapRoute = RecapRouteImport.update({
   id: '/recap',
@@ -52,6 +53,11 @@ const RSlugRoute = RSlugRouteImport.update({
   path: '/r/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const URoute = URouteImport.update({
+  id: '/u/',
+  path: '/u/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/onboarding': typeof OnboardingRoute
   '/recap': typeof RecapRoute
+  '/u/': typeof URoute
   '/r/$slug': typeof RSlugRoute
   '/u/$slug': typeof USlugRoute
 }
@@ -68,6 +75,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/onboarding': typeof OnboardingRoute
   '/recap': typeof RecapRoute
+  '/u': typeof URoute
   '/r/$slug': typeof RSlugRoute
   '/u/$slug': typeof USlugRoute
 }
@@ -78,6 +86,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/onboarding': typeof OnboardingRoute
   '/recap': typeof RecapRoute
+  '/u/': typeof URoute
   '/r/$slug': typeof RSlugRoute
   '/u/$slug': typeof USlugRoute
 }
@@ -89,6 +98,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/onboarding'
     | '/recap'
+    | '/u/'
     | '/r/$slug'
     | '/u/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -98,6 +108,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/onboarding'
     | '/recap'
+    | '/u'
     | '/r/$slug'
     | '/u/$slug'
   id:
@@ -107,6 +118,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/onboarding'
     | '/recap'
+    | '/u/'
     | '/r/$slug'
     | '/u/$slug'
   fileRoutesById: FileRoutesById
@@ -117,6 +129,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   OnboardingRoute: typeof OnboardingRoute
   RecapRoute: typeof RecapRoute
+  URoute: typeof URoute
   RSlugRoute: typeof RSlugRoute
   USlugRoute: typeof USlugRoute
 }
@@ -172,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/u/': {
+      id: '/u/'
+      path: '/u'
+      fullPath: '/u/'
+      preLoaderRoute: typeof URouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -181,6 +201,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   OnboardingRoute: OnboardingRoute,
   RecapRoute: RecapRoute,
+  URoute: URoute,
   RSlugRoute: RSlugRoute,
   USlugRoute: USlugRoute,
 }
