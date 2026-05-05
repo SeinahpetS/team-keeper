@@ -111,6 +111,7 @@ function Index() {
                 variant="outline"
                 className="w-full"
                 onClick={() => navigate({ to: "/dashboard" })}
+                onClickCapture={() => { try { window.localStorage.setItem("recap_dev_mode", "1"); } catch {} }}
               >
                 Skip sign in (dev mode)
               </Button>
