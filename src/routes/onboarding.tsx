@@ -70,9 +70,9 @@ function Onboarding() {
                 <Trophy className="h-7 w-7 text-primary" />
                 <h2 className="text-2xl font-bold">Tell us about your team</h2>
               </div>
-              <div className="space-y-2"><Label>Team name</Label><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Lincoln Eagles U14" /></div>
-              <div className="space-y-2"><Label>Sport</Label><Input value={sport} onChange={(e) => setSport(e.target.value)} placeholder="Soccer" /></div>
-              <div className="space-y-2"><Label>Season year</Label><Input type="number" value={year} onChange={(e) => setYear(Number(e.target.value))} /></div>
+              <div className="space-y-2"><Label>Team name</Label><Input className="placeholder:italic placeholder:text-muted-foreground/60" value={name} onChange={(e) => setName(e.target.value)} placeholder="Lincoln Eagles U14" /></div>
+              <div className="space-y-2"><Label>Sport</Label><Input className="placeholder:italic placeholder:text-muted-foreground/60" value={sport} onChange={(e) => setSport(e.target.value)} placeholder="Soccer" /></div>
+              <div className="space-y-2"><Label>Season year</Label><Input className="placeholder:italic placeholder:text-muted-foreground/60" type="number" value={year} onChange={(e) => setYear(Number(e.target.value))} /></div>
               <Button onClick={() => setStep(2)} disabled={!name || !sport} size="lg" className="w-full">Next</Button>
             </div>
           )}
