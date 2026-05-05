@@ -11,7 +11,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { Upload, Video, PartyPopper, Check } from "lucide-react";
 
-export const Route = createFileRoute("/u/$slug")({
+export const Route = createFileRoute("/u/")({
   component: ContributorUpload,
 });
 
