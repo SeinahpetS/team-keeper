@@ -57,10 +57,10 @@ function Index() {
               For youth sports teams
             </div>
             <h1 className="mt-6 text-5xl font-bold tracking-tight lg:text-6xl">
-              Every parent's clips.
+              Your whole season,
               <br />
               <span style={{ background: "var(--gradient-hero)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                One unforgettable reel.
+                from every angle.
               </span>
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
