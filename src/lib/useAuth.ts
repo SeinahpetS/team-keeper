@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
-const DEV_USER_ID = "00000000-0000-0000-0000-000000000dev";
+const DEV_USER_ID = "deadbeef-dead-dead-dead-deaddeaddead";
 
 export function useAuth() {
   const [session, setSession] = useState<Session | null>(null);
