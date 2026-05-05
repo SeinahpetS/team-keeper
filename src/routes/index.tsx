@@ -105,6 +105,16 @@ function Index() {
                 {mode === "signup" ? "Already have an account? Sign in" : "New here? Create an account"}
               </button>
             </form>
+            <div className="mt-4 border-t pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => navigate({ to: "/dashboard" })}
+              >
+                Skip sign in (dev mode)
+              </Button>
+            </div>
           </Card>
         </div>
       </div>
