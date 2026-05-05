@@ -14,7 +14,180 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      clips: {
+        Row: {
+          created_at: string
+          event_id: string | null
+          file_url: string
+          hearted: boolean
+          id: string
+          note: string | null
+          team_id: string
+          uploader_name: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_id?: string | null
+          file_url: string
+          hearted?: boolean
+          id?: string
+          note?: string | null
+          team_id: string
+          uploader_name?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_id?: string | null
+          file_url?: string
+          hearted?: boolean
+          id?: string
+          note?: string | null
+          team_id?: string
+          uploader_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clips_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "schedule_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clips_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recaps: {
+        Row: {
+          created_at: string
+          id: string
+          sent_at: string | null
+          status: string
+          team_id: string
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          sent_at?: string | null
+          status?: string
+          team_id: string
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          sent_at?: string | null
+          status?: string
+          team_id?: string
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recaps_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      roster: {
+        Row: {
+          created_at: string
+          id: string
+          player_name: string
+          team_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          player_name: string
+          team_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          player_name?: string
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "roster_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      schedule_events: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          name: string
+          team_id: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          name: string
+          team_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          name?: string
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedule_events_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          admin_id: string
+          created_at: string
+          id: string
+          name: string
+          season_year: number
+          sport: string
+          upload_slug: string
+        }
+        Insert: {
+          admin_id: string
+          created_at?: string
+          id?: string
+          name: string
+          season_year: number
+          sport: string
+          upload_slug?: string
+        }
+        Update: {
+          admin_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          season_year?: number
+          sport?: string
+          upload_slug?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
