@@ -13,7 +13,7 @@ import { useAuth } from "@/lib/useAuth";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
-import { Copy, Film, Users, AlertCircle, Sparkles, LogOut, Image as ImageIcon, Bell, UserPlus, CalendarPlus, ChevronRight, Trophy, Plane, Dumbbell, PartyPopper, Gamepad2 } from "lucide-react";
+import { Copy, Film, Users, AlertCircle, Sparkles, LogOut, Image as ImageIcon, Bell, UserPlus, CalendarPlus, ChevronRight, Trophy, Plane, Dumbbell, PartyPopper, Gamepad2, Archive, EyeOff, Plus } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
@@ -32,7 +32,7 @@ type EventRow = {
   opponent: string | null;
   notes: string | null;
 };
-type RosterRow = { id: string; player_name: string; jersey_number: string | null; permission_status: string };
+type RosterRow = { id: string; player_name: string; jersey_number: string | null; permission_status: string; status: string; inactive_date: string | null };
 type ClipRow = { id: string; event_id: string | null; uploader_name: string | null; player_tags: string[]; content_type: string; broll_type: string | null; approval_status: string };
 type RecapRow = { id: string; status: string };
 
@@ -54,6 +54,8 @@ function Dashboard() {
   const [recap, setRecap] = useState<RecapRow | null>(null);
   const [openTournaments, setOpenTournaments] = useState<Record<string, boolean>>({});
   const [addEventOpen, setAddEventOpen] = useState(false);
+  const [addPlayerOpen, setAddPlayerOpen] = useState(false);
+  const [showInactive, setShowInactive] = useState(false);
 
   const refresh = async (uid: string) => {
     const { data: t } = await supabase.from("teams").select("*").eq("admin_id", uid).maybeSingle();
@@ -61,7 +63,7 @@ function Dashboard() {
     setTeam(t as Team);
     const [{ data: ev }, { data: r }, { data: c }, { data: rc }] = await Promise.all([
       supabase.from("schedule_events").select("*").eq("team_id", t.id).order("date"),
-      supabase.from("roster").select("*").eq("team_id", t.id).order("jersey_number"),
+      supabase.from("roster").select("id,player_name,jersey_number,permission_status,status,inactive_date").eq("team_id", t.id).order("jersey_number"),
       supabase.from("clips").select("id,event_id,uploader_name,player_tags,content_type,broll_type,approval_status").eq("team_id", t.id),
       supabase.from("recaps").select("id,status").eq("team_id", t.id).maybeSingle(),
     ]);
@@ -98,7 +100,9 @@ function Dashboard() {
     return set;
   }, [clips, roster]);
 
-  const noFootageCount = roster.filter((p) => !playersWithFootage.has(p.player_name.toLowerCase()) && !playersWithMentions.has(p.player_name.toLowerCase())).length;
+  const activeRoster = roster.filter((p) => p.status === "active");
+  const inactiveRoster = roster.filter((p) => p.status === "inactive");
+  const noFootageCount = activeRoster.filter((p) => !playersWithFootage.has(p.player_name.toLowerCase()) && !playersWithMentions.has(p.player_name.toLowerCase())).length;
   const contributors = new Set(clips.map((c) => c.uploader_name).filter(Boolean)).size;
 
   const brollClips = clips.filter((c) => c.content_type === "broll");
@@ -246,22 +250,38 @@ function Dashboard() {
 
         {/* Roster coverage */}
         <Card className="p-6">
-          <h3 className="font-semibold">Roster coverage</h3>
-          <p className="mt-1 text-xs text-muted-foreground">Tap a player to send a focused content request.</p>
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold">Roster coverage</h3>
+            <Button variant="ghost" size="sm" onClick={() => setAddPlayerOpen(true)}><Plus className="mr-1 h-4 w-4" />Add player</Button>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">Tap a player to send a focused content request, or change status.</p>
           <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-            {roster.map((p) => {
+            {activeRoster.map((p) => {
               const hasTagged = playersWithFootage.has(p.player_name.toLowerCase());
               const hasMention = playersWithMentions.has(p.player_name.toLowerCase());
               const color = hasTagged ? "border-primary bg-primary/10" : hasMention ? "border-accent bg-accent/10" : "border-destructive bg-destructive/10";
               return (
-                <button key={p.id} onClick={() => requestPlayerFootage(p.player_name)} className={`flex items-center justify-between rounded-lg border-2 px-3 py-2 text-left text-sm hover:opacity-80 ${color}`}>
-                  <span className="truncate font-medium">{p.player_name}</span>
-                  {p.jersey_number && <span className="ml-2 text-xs text-muted-foreground">#{p.jersey_number}</span>}
-                </button>
+                <PlayerChip key={p.id} player={p} colorClass={color} onRequest={() => requestPlayerFootage(p.player_name)} onChanged={() => user && refresh(user.id)} />
               );
             })}
-            {roster.length === 0 && <p className="col-span-full text-sm text-muted-foreground">No players yet.</p>}
+            {activeRoster.length === 0 && <p className="col-span-full text-sm text-muted-foreground">No active players yet.</p>}
           </div>
+
+          {inactiveRoster.length > 0 && (
+            <Collapsible open={showInactive} onOpenChange={setShowInactive} className="mt-4">
+              <CollapsibleTrigger className="flex w-full items-center gap-2 rounded-md bg-muted/40 px-3 py-2 text-left text-sm">
+                <ChevronRight className={`h-4 w-4 transition-transform ${showInactive ? "rotate-90" : ""}`} />
+                <EyeOff className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium">Inactive ({inactiveRoster.length})</span>
+                <span className="ml-2 text-xs text-muted-foreground">Not counted toward coverage gaps</span>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-2 grid grid-cols-2 gap-2 opacity-60 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+                {inactiveRoster.map((p) => (
+                  <PlayerChip key={p.id} player={p} colorClass="border-border bg-muted/30" onRequest={() => {}} onChanged={() => user && refresh(user.id)} />
+                ))}
+              </CollapsibleContent>
+            </Collapsible>
+          )}
         </Card>
 
         {/* Quick actions */}
@@ -281,6 +301,12 @@ function Dashboard() {
         onOpenChange={setAddEventOpen}
         teamId={team.id}
         tournaments={topLevelEvents.filter((e) => e.event_type === "tournament")}
+        onAdded={() => user && refresh(user.id)}
+      />
+      <AddPlayerDialog
+        open={addPlayerOpen}
+        onOpenChange={setAddPlayerOpen}
+        teamId={team.id}
         onAdded={() => user && refresh(user.id)}
       />
     </div>
