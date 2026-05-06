@@ -18,11 +18,13 @@ export function DotMatrixNumber({
   dotRadius = 7,
   gap = 16,
   digitSpacing = 2,
+  unlitRadius,
 }: {
   value: number | string;
   dotRadius?: number;
   gap?: number;
   digitSpacing?: number;
+  unlitRadius?: number;
   // legacy props (ignored)
   scale?: number;
   radius?: number;
@@ -53,6 +55,7 @@ export function DotMatrixNumber({
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, cssW, cssH);
 
+    const rUnlit = unlitRadius ?? dotRadius * 0.35;
     let cx = 0;
     digits.forEach((d) => {
       const pattern = DIGITS[d];
@@ -60,15 +63,16 @@ export function DotMatrixNumber({
         for (let col = 0; col < pattern[row].length; col++) {
           const x = (cx + col) * gap + dotRadius;
           const y = row * gap + dotRadius;
+          const lit = pattern[row][col] === 1;
           ctx.beginPath();
-          ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
-          ctx.fillStyle = pattern[row][col] === 1 ? "#F0C84A" : "#1E6B3D";
+          ctx.arc(x, y, lit ? dotRadius : rUnlit, 0, Math.PI * 2);
+          ctx.fillStyle = lit ? "#F0C84A" : "#1E6B3D";
           ctx.fill();
         }
       }
       cx += pattern[0].length + digitSpacing;
     });
-  }, [value, dotRadius, gap, digitSpacing]);
+  }, [value, dotRadius, gap, digitSpacing, unlitRadius]);
 
   return <canvas ref={ref} aria-label={String(value)} />;
 }
