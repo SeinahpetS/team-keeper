@@ -198,6 +198,36 @@ export type Database = {
           },
         ]
       }
+      roster_claims: {
+        Row: {
+          claimer_contact: string | null
+          claimer_name: string
+          contributor_type: string
+          created_at: string
+          id: string
+          roster_player_id: string
+          team_id: string
+        }
+        Insert: {
+          claimer_contact?: string | null
+          claimer_name: string
+          contributor_type: string
+          created_at?: string
+          id?: string
+          roster_player_id: string
+          team_id: string
+        }
+        Update: {
+          claimer_contact?: string | null
+          claimer_name?: string
+          contributor_type?: string
+          created_at?: string
+          id?: string
+          roster_player_id?: string
+          team_id?: string
+        }
+        Relationships: []
+      }
       schedule_events: {
         Row: {
           created_at: string
