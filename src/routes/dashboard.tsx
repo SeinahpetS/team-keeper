@@ -439,7 +439,7 @@ function ScoreboardPanel({ teamName, season, clips, contributors, players }: { t
     textAlign: "center" as const,
   };
   // Three fixed renders per stat — one per breakpoint, toggled via CSS visibility.
-  const Dot = ({ value, r, g }: { value: number; r: number; g: number }) => (
+  const Dot = ({ value, r, g, minDigits = 2 }: { value: number; r: number; g: number; minDigits?: number }) => (
     <DotMatrixNumber
       value={value}
       dotRadius={r}
@@ -447,14 +447,14 @@ function ScoreboardPanel({ teamName, season, clips, contributors, players }: { t
       unlitRadius={r}
       offOuter="#0D2018"
       offInner="#112516"
-      minDigits={3}
+      minDigits={minDigits}
     />
   );
-  const StatPanel = ({ value, label }: { value: number; label: string }) => (
+  const StatPanel = ({ value, label, minDigits = 2 }: { value: number; label: string; minDigits?: number }) => (
     <div className="sb-panel sb-bordered">
-      <div className="sb-mobile"><Dot value={value} r={2.5} g={6} /></div>
-      <div className="sb-tablet"><Dot value={value} r={3.5} g={8} /></div>
-      <div className="sb-desktop"><Dot value={value} r={4.5} g={10.5} /></div>
+      <div className="sb-mobile"><Dot value={value} r={2.5} g={6} minDigits={minDigits} /></div>
+      <div className="sb-tablet"><Dot value={value} r={3.5} g={8} minDigits={minDigits} /></div>
+      <div className="sb-desktop"><Dot value={value} r={4.5} g={10.5} minDigits={minDigits} /></div>
       <div className="sb-label" style={labelStyle}>{label}</div>
     </div>
   );
@@ -487,18 +487,18 @@ function ScoreboardPanel({ teamName, season, clips, contributors, players }: { t
         KEEPER · {teamName.toUpperCase()}
       </div>
       <div className="sb-row">
-        <StatPanel value={clips} label="Clips" />
+        <StatPanel value={players} label="Players" minDigits={2} />
         <div className="sb-panel sb-games">
           <div className="sb-season">
             {seasonPill}
             <div style={{ ...labelStyle, fontSize: "9px", marginTop: "2px" }}>Season</div>
           </div>
-          <div className="sb-mobile"><Dot value={contributors} r={2.5} g={6} /></div>
-          <div className="sb-tablet"><Dot value={contributors} r={5} g={11.5} /></div>
-          <div className="sb-desktop"><Dot value={contributors} r={6.5} g={15} /></div>
-          <div className="sb-label" style={labelStyle}>Contributors</div>
+          <div className="sb-mobile"><Dot value={clips} r={2.5} g={6} minDigits={3} /></div>
+          <div className="sb-tablet"><Dot value={clips} r={5} g={11.5} minDigits={3} /></div>
+          <div className="sb-desktop"><Dot value={clips} r={6.5} g={15} minDigits={3} /></div>
+          <div className="sb-label" style={labelStyle}>Clips</div>
         </div>
-        <StatPanel value={players} label="Players" />
+        <StatPanel value={contributors} label="Contributors" minDigits={2} />
       </div>
 
       <style>{`
