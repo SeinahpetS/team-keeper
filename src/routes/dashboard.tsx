@@ -98,7 +98,7 @@ function Dashboard() {
     setRecap((rc as any) || null);
     const newClaims = (cl || []) as ClaimRow[];
     if (typeof window !== "undefined") {
-      const seen = new Set<string>(JSON.parse(window.localStorage.getItem(`recap_seen_claims_${t.id}`) || "[]"));
+      const seen = new Set<string>(JSON.parse(window.localStorage.getItem(`keeper_seen_claims_${t.id}`) || "[]"));
       const unseen = newClaims.filter((cc) => !seen.has(cc.id));
       if (unseen.length && claims.length) {
         unseen.slice(0, 3).forEach((u) => {
@@ -108,7 +108,7 @@ function Dashboard() {
         });
       }
       const all = new Set<string>([...seen, ...newClaims.map((cc) => cc.id)]);
-      window.localStorage.setItem(`recap_seen_claims_${t.id}`, JSON.stringify(Array.from(all)));
+      window.localStorage.setItem(`keeper_seen_claims_${t.id}`, JSON.stringify(Array.from(all)));
       setSeenClaimIds(all);
     }
     setClaims(newClaims);
@@ -239,7 +239,7 @@ function Dashboard() {
           players={activeRoster.length}
         />
 
-        {/* Schedule + Recap status */}
+        {/* Schedule + KEEPER status */}
         <div className="grid gap-4 md:grid-cols-2">
           <Card className="p-6">
             <div className="flex items-center justify-between">
@@ -288,7 +288,7 @@ function Dashboard() {
             <Card className="p-6">
               <div className="flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-primary" />
-                <h3 className="font-semibold">Recap status</h3>
+                <h3 className="font-semibold">KEEPER status</h3>
               </div>
               <div className="mt-3 space-y-2">
                 <div className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-2">
@@ -306,7 +306,7 @@ function Dashboard() {
                   <span className="text-[10px] uppercase tracking-wide text-accent-foreground">60–90s • free</span>
                 </div>
               </div>
-              <Link to="/recap"><Button variant="outline" className="mt-4 w-full">Open recap</Button></Link>
+              <Link to="/recap"><Button variant="outline" className="mt-4 w-full">Open KEEPER</Button></Link>
             </Card>
 
             <Card className="p-6">

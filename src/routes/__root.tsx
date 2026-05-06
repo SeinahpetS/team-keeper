@@ -30,9 +30,9 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Recap — Team highlight reels from everyone's phone" },
-      { name: "description", content: "Crowdsource your youth sports team's season recap. Collect clips from every parent, compile the highlight reel, share the magic." },
-      { property: "og:title", content: "Recap — Team highlight reels" },
+      { title: "KEEPER — Team keepsakes from everyone's phone" },
+      { name: "description", content: "Crowdsource your sports team's season keepsake. Collect clips from every parent, compile the highlight reel, share the magic." },
+      { property: "og:title", content: "KEEPER — Team keepsakes" },
       { property: "og:description", content: "Every parent's clips. One unforgettable reel." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

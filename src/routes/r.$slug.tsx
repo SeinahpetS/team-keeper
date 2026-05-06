@@ -37,13 +37,13 @@ function TeamRecap() {
             <Trophy className="h-8 w-8 text-primary-foreground" />
           </div>
           <h1 className="mt-6 text-4xl font-bold">{team.name}</h1>
-          <p className="mt-2 text-muted-foreground">{team.sport} • {team.season_year} Season Recap</p>
+          <p className="mt-2 text-muted-foreground">{team.sport} • {team.season_year} Season KEEPER</p>
         </div>
         <Card className="mt-8 overflow-hidden p-0" style={{ boxShadow: "var(--shadow-soft)" }}>
           {recap?.video_url ? (
             <video src={recap.video_url} controls autoPlay className="aspect-video w-full bg-black" />
           ) : (
-            <div className="flex aspect-video w-full items-center justify-center bg-muted text-muted-foreground">Recap coming soon ✨</div>
+            <div className="flex aspect-video w-full items-center justify-center bg-muted text-muted-foreground">KEEPER coming soon ✨</div>
           )}
         </Card>
         <p className="mt-6 text-center text-sm text-muted-foreground">Made by everyone. For everyone. ❤️</p>

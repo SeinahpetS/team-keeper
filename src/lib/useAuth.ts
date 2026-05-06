@@ -19,7 +19,7 @@ export function useAuth() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
-  const devMode = typeof window !== "undefined" && window.localStorage.getItem("recap_dev_mode") === "1";
-  const devUser = devMode ? ({ id: DEV_USER_ID, email: "dev@recap.local" } as any) : null;
+  const devMode = typeof window !== "undefined" && window.localStorage.getItem("keeper_dev_mode") === "1";
+  const devUser = devMode ? ({ id: DEV_USER_ID, email: "dev@keeper.local" } as any) : null;
   return { session, user: session?.user ?? devUser, loading };
 }
