@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/useAuth";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
-import { Trophy, Send, ArrowLeft, Sparkles, Check, X } from "lucide-react";
+import { Trophy, Send, ArrowLeft, Sparkles, Check, X, Film, Share2 } from "lucide-react";
 
 export const Route = createFileRoute("/recap")({
   component: RecapFlow,
@@ -26,6 +26,8 @@ type Recap = {
   mix_full_game: number;
   render_count: number;
   recap_type: string;
+  social_video_url: string | null;
+  social_status: string;
 };
 type Clip = { id: string; file_url: string; content_type: string; broll_type: string | null; uploader_name: string | null; vibe: string | null; approval_status: string };
 
@@ -105,6 +107,8 @@ function RecapFlow() {
         render_count: recap.render_count + 1,
         status: "ready",
         video_url: recap.video_url || "https://www.w3schools.com/html/mov_bbb.mp4",
+        social_status: "ready",
+        social_video_url: recap.social_video_url || "https://www.w3schools.com/html/mov_bbb.mp4",
       });
       setRendering(false);
       setStep(3);
@@ -160,6 +164,23 @@ function RecapFlow() {
               <h2 className="text-2xl font-bold">Set your mix</h2>
               <p className="mt-1 text-sm text-muted-foreground">Sliders auto-balance to 100%. We'll flag any category bigger than your clip pool.</p>
             </div>
+            <div className="space-y-2">
+              <div className="text-sm font-medium">Recap type</div>
+              <div className="grid grid-cols-2 gap-2">
+                {([
+                  { v: "tournament", l: "Tournament recap", d: "A specific tournament & nested games" },
+                  { v: "season", l: "End of season recap", d: "The full season" },
+                ] as const).map((t) => (
+                  <button key={t.v} type="button" onClick={() => updateRecap({ recap_type: t.v })} className={`rounded-lg border-2 px-3 py-2 text-left text-sm ${recap.recap_type === t.v ? "border-primary bg-primary/10 text-primary" : "border-border"}`}>
+                    <div className="font-medium">{t.l}</div>
+                    <div className="text-xs text-muted-foreground">{t.d}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="rounded-lg border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
+              Every compile produces <span className="font-semibold text-foreground">two outputs</span>: a 3–5 min full-length recap and a free 60–90s social cut for Instagram & TikTok.
+            </div>
             <MixSlider label="Individual plays" value={recap.mix_individual} available={playClips.length} onChange={(v) => setMix("mix_individual", v)} onCommit={saveMix} />
             <MixSlider label="Team b-roll" value={recap.mix_team_broll} available={brollClips.filter((c) => c.broll_type !== "fan_sideline").length} onChange={(v) => setMix("mix_team_broll", v)} onCommit={saveMix} />
             <MixSlider label="Fan footage" value={recap.mix_fan} available={brollClips.filter((c) => c.broll_type === "fan_sideline").length} onChange={(v) => setMix("mix_fan", v)} onCommit={saveMix} />
@@ -207,11 +228,22 @@ function RecapFlow() {
         {step === 3 && (
           <Card className="space-y-4 p-6" style={{ boxShadow: "var(--shadow-soft)" }}>
             <h2 className="text-2xl font-bold">Render preview</h2>
-            {recap.video_url ? (
-              <video src={recap.video_url} controls className="aspect-video w-full rounded-lg bg-black" />
-            ) : (
-              <div className="aspect-video w-full rounded-lg bg-muted" />
-            )}
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm font-medium"><Film className="h-4 w-4 text-primary" />Full-length recap <span className="text-xs text-muted-foreground">3–5 min</span></div>
+                {recap.video_url ? (
+                  <video src={recap.video_url} controls className="aspect-video w-full rounded-lg bg-black" />
+                ) : <div className="aspect-video w-full rounded-lg bg-muted" />}
+                <div className="text-xs text-muted-foreground">Status: <span className="font-semibold text-foreground capitalize">{recap.status}</span></div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm font-medium"><Share2 className="h-4 w-4 text-accent-foreground" />Social cut <span className="text-xs text-muted-foreground">60–90s • free</span></div>
+                {recap.social_video_url ? (
+                  <video src={recap.social_video_url} controls className="aspect-video w-full rounded-lg bg-black" />
+                ) : <div className="aspect-video w-full rounded-lg bg-muted" />}
+                <div className="text-xs text-muted-foreground">Includes a tasteful Recap watermark for sharing.</div>
+              </div>
+            </div>
             <p className="text-xs text-muted-foreground">Renders used: {recap.render_count} / {MAX_RENDERS}</p>
             <div className="flex gap-2">
               <Button variant="outline" className="flex-1" onClick={() => setStep(1)}>Adjust mix</Button>

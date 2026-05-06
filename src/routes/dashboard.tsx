@@ -13,7 +13,8 @@ import { useAuth } from "@/lib/useAuth";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
-import { Copy, Film, Users, AlertCircle, Sparkles, LogOut, Image as ImageIcon, Bell, UserPlus, CalendarPlus, ChevronRight, Trophy, Plane, Dumbbell, PartyPopper, Gamepad2 } from "lucide-react";
+import { Copy, Film, Users, AlertCircle, Sparkles, LogOut, Image as ImageIcon, Bell, UserPlus, CalendarPlus, ChevronRight, Trophy, Plane, Dumbbell, PartyPopper, Gamepad2, Archive, EyeOff, Plus } from "lucide-react";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
@@ -32,9 +33,9 @@ type EventRow = {
   opponent: string | null;
   notes: string | null;
 };
-type RosterRow = { id: string; player_name: string; jersey_number: string | null; permission_status: string };
+type RosterRow = { id: string; player_name: string; jersey_number: string | null; permission_status: string; status: string; inactive_date: string | null };
 type ClipRow = { id: string; event_id: string | null; uploader_name: string | null; player_tags: string[]; content_type: string; broll_type: string | null; approval_status: string };
-type RecapRow = { id: string; status: string };
+type RecapRow = { id: string; status: string; social_status: string };
 
 const EVENT_ICON: Record<string, any> = { game: Gamepad2, tournament: Trophy, practice: Dumbbell, event: PartyPopper, travel: Plane };
 
@@ -54,6 +55,8 @@ function Dashboard() {
   const [recap, setRecap] = useState<RecapRow | null>(null);
   const [openTournaments, setOpenTournaments] = useState<Record<string, boolean>>({});
   const [addEventOpen, setAddEventOpen] = useState(false);
+  const [addPlayerOpen, setAddPlayerOpen] = useState(false);
+  const [showInactive, setShowInactive] = useState(false);
 
   const refresh = async (uid: string) => {
     const { data: t } = await supabase.from("teams").select("*").eq("admin_id", uid).maybeSingle();
@@ -61,9 +64,9 @@ function Dashboard() {
     setTeam(t as Team);
     const [{ data: ev }, { data: r }, { data: c }, { data: rc }] = await Promise.all([
       supabase.from("schedule_events").select("*").eq("team_id", t.id).order("date"),
-      supabase.from("roster").select("*").eq("team_id", t.id).order("jersey_number"),
+      supabase.from("roster").select("id,player_name,jersey_number,permission_status,status,inactive_date").eq("team_id", t.id).order("jersey_number"),
       supabase.from("clips").select("id,event_id,uploader_name,player_tags,content_type,broll_type,approval_status").eq("team_id", t.id),
-      supabase.from("recaps").select("id,status").eq("team_id", t.id).maybeSingle(),
+      supabase.from("recaps").select("id,status,social_status").eq("team_id", t.id).maybeSingle(),
     ]);
     setEvents((ev || []) as any);
     setRoster((r || []) as any);
@@ -98,19 +101,24 @@ function Dashboard() {
     return set;
   }, [clips, roster]);
 
-  const noFootageCount = roster.filter((p) => !playersWithFootage.has(p.player_name.toLowerCase()) && !playersWithMentions.has(p.player_name.toLowerCase())).length;
+  const activeRoster = roster.filter((p) => p.status === "active");
+  const inactiveRoster = roster.filter((p) => p.status === "inactive");
+  const noFootageCount = activeRoster.filter((p) => !playersWithFootage.has(p.player_name.toLowerCase()) && !playersWithMentions.has(p.player_name.toLowerCase())).length;
   const contributors = new Set(clips.map((c) => c.uploader_name).filter(Boolean)).size;
 
   const brollClips = clips.filter((c) => c.content_type === "broll");
   const brollByType = (t: string) => brollClips.filter((c) => c.broll_type === t).length;
 
-  const recapState = (() => {
-    if (!recap) return clips.length >= 5 ? "Enough to compile" : "Not started";
-    if (recap.status === "sent") return "Sent";
-    if (recap.status === "ready") return "Ready to review";
-    if (recap.status === "compiling") return "Compiling";
+  const labelFor = (s: string | undefined) => {
+    if (!s) return clips.length >= 5 ? "Enough to compile" : "Not started";
+    if (s === "sent") return "Sent";
+    if (s === "ready") return "Ready to review";
+    if (s === "compiling") return "Compiling";
+    if (s === "draft") return clips.length >= 5 ? "Enough to compile" : "Not started";
     return "Ready to review";
-  })();
+  };
+  const recapState = labelFor(recap?.status);
+  const socialState = labelFor(recap?.social_status);
 
   const uploadUrl = team ? `${typeof window !== "undefined" ? window.location.origin : ""}/u/${team.upload_slug}` : "";
 
@@ -219,8 +227,22 @@ function Dashboard() {
                 <Sparkles className="h-5 w-5 text-primary" />
                 <h3 className="font-semibold">Recap status</h3>
               </div>
-              <div className="mt-3 text-2xl font-bold">{recapState}</div>
-              <p className="mt-1 text-xs text-muted-foreground">Tap to open the compile flow.</p>
+              <div className="mt-3 space-y-2">
+                <div className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-2">
+                  <div>
+                    <div className="text-xs text-muted-foreground">Full-length</div>
+                    <div className="font-semibold">{recapState}</div>
+                  </div>
+                  <span className="text-[10px] uppercase tracking-wide text-muted-foreground">3–5 min</span>
+                </div>
+                <div className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-2">
+                  <div>
+                    <div className="text-xs text-muted-foreground">Social cut</div>
+                    <div className="font-semibold">{socialState}</div>
+                  </div>
+                  <span className="text-[10px] uppercase tracking-wide text-accent-foreground">60–90s • free</span>
+                </div>
+              </div>
               <Link to="/recap"><Button variant="outline" className="mt-4 w-full">Open recap</Button></Link>
             </Card>
 
@@ -246,22 +268,38 @@ function Dashboard() {
 
         {/* Roster coverage */}
         <Card className="p-6">
-          <h3 className="font-semibold">Roster coverage</h3>
-          <p className="mt-1 text-xs text-muted-foreground">Tap a player to send a focused content request.</p>
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold">Roster coverage</h3>
+            <Button variant="ghost" size="sm" onClick={() => setAddPlayerOpen(true)}><Plus className="mr-1 h-4 w-4" />Add player</Button>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">Tap a player to send a focused content request, or change status.</p>
           <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-            {roster.map((p) => {
+            {activeRoster.map((p) => {
               const hasTagged = playersWithFootage.has(p.player_name.toLowerCase());
               const hasMention = playersWithMentions.has(p.player_name.toLowerCase());
               const color = hasTagged ? "border-primary bg-primary/10" : hasMention ? "border-accent bg-accent/10" : "border-destructive bg-destructive/10";
               return (
-                <button key={p.id} onClick={() => requestPlayerFootage(p.player_name)} className={`flex items-center justify-between rounded-lg border-2 px-3 py-2 text-left text-sm hover:opacity-80 ${color}`}>
-                  <span className="truncate font-medium">{p.player_name}</span>
-                  {p.jersey_number && <span className="ml-2 text-xs text-muted-foreground">#{p.jersey_number}</span>}
-                </button>
+                <PlayerChip key={p.id} player={p} colorClass={color} onRequest={() => requestPlayerFootage(p.player_name)} onChanged={() => user && refresh(user.id)} />
               );
             })}
-            {roster.length === 0 && <p className="col-span-full text-sm text-muted-foreground">No players yet.</p>}
+            {activeRoster.length === 0 && <p className="col-span-full text-sm text-muted-foreground">No active players yet.</p>}
           </div>
+
+          {inactiveRoster.length > 0 && (
+            <Collapsible open={showInactive} onOpenChange={setShowInactive} className="mt-4">
+              <CollapsibleTrigger className="flex w-full items-center gap-2 rounded-md bg-muted/40 px-3 py-2 text-left text-sm">
+                <ChevronRight className={`h-4 w-4 transition-transform ${showInactive ? "rotate-90" : ""}`} />
+                <EyeOff className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium">Inactive ({inactiveRoster.length})</span>
+                <span className="ml-2 text-xs text-muted-foreground">Not counted toward coverage gaps</span>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-2 grid grid-cols-2 gap-2 opacity-60 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+                {inactiveRoster.map((p) => (
+                  <PlayerChip key={p.id} player={p} colorClass="border-border bg-muted/30" onRequest={() => {}} onChanged={() => user && refresh(user.id)} />
+                ))}
+              </CollapsibleContent>
+            </Collapsible>
+          )}
         </Card>
 
         {/* Quick actions */}
@@ -281,6 +319,12 @@ function Dashboard() {
         onOpenChange={setAddEventOpen}
         teamId={team.id}
         tournaments={topLevelEvents.filter((e) => e.event_type === "tournament")}
+        onAdded={() => user && refresh(user.id)}
+      />
+      <AddPlayerDialog
+        open={addPlayerOpen}
+        onOpenChange={setAddPlayerOpen}
+        teamId={team.id}
         onAdded={() => user && refresh(user.id)}
       />
     </div>
@@ -395,6 +439,82 @@ function AddEventDialog({ open, onOpenChange, teamId, tournaments, onAdded }: { 
           </div>
           <div className="space-y-1.5"><Label>Location</Label><Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Home field" /></div>
           {(type === "practice" || type === "event") && <div className="space-y-1.5"><Label>Notes</Label><Textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} /></div>}
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button onClick={submit} disabled={busy}>{busy ? "Adding..." : "Add"}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function PlayerChip({ player, colorClass, onRequest, onChanged }: { player: RosterRow; colorClass: string; onRequest: () => void; onChanged: () => void }) {
+  const setStatus = async (status: string) => {
+    const patch: any = { status };
+    if (status === "inactive") patch.inactive_date = new Date().toISOString().slice(0, 10);
+    await supabase.from("roster").update(patch).eq("id", player.id);
+    toast.success(`${player.player_name} → ${status}`);
+    onChanged();
+  };
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className={`flex items-center justify-between rounded-lg border-2 px-3 py-2 text-left text-sm hover:opacity-80 ${colorClass}`}>
+          <span className="truncate font-medium">{player.player_name}</span>
+          {player.jersey_number && <span className="ml-2 text-xs text-muted-foreground">#{player.jersey_number}</span>}
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start">
+        <DropdownMenuItem onClick={onRequest}><UserPlus className="mr-2 h-4 w-4" />Request footage</DropdownMenuItem>
+        {player.status !== "active" && <DropdownMenuItem onClick={() => setStatus("active")}>Set active</DropdownMenuItem>}
+        {player.status !== "inactive" && <DropdownMenuItem onClick={() => setStatus("inactive")}><EyeOff className="mr-2 h-4 w-4" />Mark inactive</DropdownMenuItem>}
+        {player.status !== "archived" && <DropdownMenuItem onClick={() => setStatus("archived")}><Archive className="mr-2 h-4 w-4" />Archive</DropdownMenuItem>}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function AddPlayerDialog({ open, onOpenChange, teamId, onAdded }: { open: boolean; onOpenChange: (b: boolean) => void; teamId: string; onAdded: () => void }) {
+  const [name, setName] = useState("");
+  const [jersey, setJersey] = useState("");
+  const [status, setStatus] = useState("active");
+  const [busy, setBusy] = useState(false);
+
+  const submit = async () => {
+    if (!name.trim()) { toast.error("Name required"); return; }
+    setBusy(true);
+    const { error } = await supabase.from("roster").insert({
+      team_id: teamId,
+      player_name: name.trim(),
+      jersey_number: jersey.trim() || null,
+      status,
+    });
+    setBusy(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Player added");
+    setName(""); setJersey(""); setStatus("active");
+    onOpenChange(false);
+    onAdded();
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader><DialogTitle>Add player</DialogTitle></DialogHeader>
+        <div className="space-y-3">
+          <div className="space-y-1.5"><Label>Player name</Label><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Player name" /></div>
+          <div className="space-y-1.5"><Label>Jersey number</Label><Input value={jersey} onChange={(e) => setJersey(e.target.value)} placeholder="#" /></div>
+          <div className="space-y-1.5">
+            <Label>Status</Label>
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
