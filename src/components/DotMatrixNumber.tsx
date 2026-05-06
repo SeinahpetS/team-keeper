@@ -28,9 +28,8 @@ export function DotMatrixNumber({ value, scale = 2 }: { value: number | string; 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const isDark = typeof document !== "undefined" && document.documentElement.classList.contains("dark");
-    const lit = isDark ? "#F0C84A" : "#1F6E3A";
-    const unlit = isDark ? "#1E6B3D" : "#BDE3CB";
+    const lit = "#F0C84A";
+    const unlit = "#1E6B3D";
 
     const r = RADIUS * scale;
     const gap = GAP * scale;
