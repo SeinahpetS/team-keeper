@@ -431,3 +431,79 @@ function AddEventDialog({ open, onOpenChange, teamId, tournaments, onAdded }: { 
     </Dialog>
   );
 }
+
+function PlayerChip({ player, colorClass, onRequest, onChanged }: { player: RosterRow; colorClass: string; onRequest: () => void; onChanged: () => void }) {
+  const setStatus = async (status: string) => {
+    const patch: any = { status };
+    if (status === "inactive") patch.inactive_date = new Date().toISOString().slice(0, 10);
+    await supabase.from("roster").update(patch).eq("id", player.id);
+    toast.success(`${player.player_name} → ${status}`);
+    onChanged();
+  };
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className={`flex items-center justify-between rounded-lg border-2 px-3 py-2 text-left text-sm hover:opacity-80 ${colorClass}`}>
+          <span className="truncate font-medium">{player.player_name}</span>
+          {player.jersey_number && <span className="ml-2 text-xs text-muted-foreground">#{player.jersey_number}</span>}
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start">
+        <DropdownMenuItem onClick={onRequest}><UserPlus className="mr-2 h-4 w-4" />Request footage</DropdownMenuItem>
+        {player.status !== "active" && <DropdownMenuItem onClick={() => setStatus("active")}>Set active</DropdownMenuItem>}
+        {player.status !== "inactive" && <DropdownMenuItem onClick={() => setStatus("inactive")}><EyeOff className="mr-2 h-4 w-4" />Mark inactive</DropdownMenuItem>}
+        {player.status !== "archived" && <DropdownMenuItem onClick={() => setStatus("archived")}><Archive className="mr-2 h-4 w-4" />Archive</DropdownMenuItem>}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function AddPlayerDialog({ open, onOpenChange, teamId, onAdded }: { open: boolean; onOpenChange: (b: boolean) => void; teamId: string; onAdded: () => void }) {
+  const [name, setName] = useState("");
+  const [jersey, setJersey] = useState("");
+  const [status, setStatus] = useState("active");
+  const [busy, setBusy] = useState(false);
+
+  const submit = async () => {
+    if (!name.trim()) { toast.error("Name required"); return; }
+    setBusy(true);
+    const { error } = await supabase.from("roster").insert({
+      team_id: teamId,
+      player_name: name.trim(),
+      jersey_number: jersey.trim() || null,
+      status,
+    });
+    setBusy(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Player added");
+    setName(""); setJersey(""); setStatus("active");
+    onOpenChange(false);
+    onAdded();
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader><DialogTitle>Add player</DialogTitle></DialogHeader>
+        <div className="space-y-3">
+          <div className="space-y-1.5"><Label>Player name</Label><Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Player name" /></div>
+          <div className="space-y-1.5"><Label>Jersey number</Label><Input value={jersey} onChange={(e) => setJersey(e.target.value)} placeholder="#" /></div>
+          <div className="space-y-1.5">
+            <Label>Status</Label>
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button onClick={submit} disabled={busy}>{busy ? "Adding..." : "Add"}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
