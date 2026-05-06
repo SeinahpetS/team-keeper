@@ -15,10 +15,18 @@ const GLYPHS: Record<string, number[][]> = {
 
 const COLS = 4;
 const ROWS = 5;
-const RADIUS = 2.5;
-const GAP = 5;
 
-export function DotMatrixNumber({ value, scale = 2 }: { value: number | string; scale?: number }) {
+export function DotMatrixNumber({
+  value,
+  scale = 2,
+  radius = 2.5,
+  gap = 5,
+}: {
+  value: number | string;
+  scale?: number;
+  radius?: number;
+  gap?: number;
+}) {
   const ref = useRef<HTMLCanvasElement>(null);
   const digits = String(value);
 
@@ -31,12 +39,12 @@ export function DotMatrixNumber({ value, scale = 2 }: { value: number | string; 
     const lit = "#F0C84A";
     const unlit = "#1E6B3D";
 
-    const r = RADIUS * scale;
-    const gap = GAP * scale;
-    const step = r * 2 + gap;
-    const digitW = COLS * r * 2 + (COLS - 1) * gap;
-    const digitH = ROWS * r * 2 + (ROWS - 1) * gap;
-    const digitGap = gap * 2;
+    const r = radius * scale;
+    const g = gap * scale;
+    const step = r * 2 + g;
+    const digitW = COLS * r * 2 + (COLS - 1) * g;
+    const digitH = ROWS * r * 2 + (ROWS - 1) * g;
+    const digitGap = g + r * 2; // 1-column gap between digits
 
     const totalW = digits.length * digitW + (digits.length - 1) * digitGap;
     const dpr = typeof window !== "undefined" ? window.devicePixelRatio || 1 : 1;
@@ -62,7 +70,7 @@ export function DotMatrixNumber({ value, scale = 2 }: { value: number | string; 
         }
       }
     });
-  }, [digits, scale]);
+  }, [digits, scale, radius, gap]);
 
   return <canvas ref={ref} aria-label={String(value)} />;
 }
