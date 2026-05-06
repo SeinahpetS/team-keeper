@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
 import { Copy, Film, Users, AlertCircle, Sparkles, LogOut, Image as ImageIcon, Bell, UserPlus, CalendarPlus, ChevronRight, Trophy, Plane, Dumbbell, PartyPopper, Gamepad2, Archive, EyeOff, Plus, User, Heart, X } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { DotMatrixNumber } from "@/components/DotMatrixNumber";
 
 export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
@@ -199,9 +200,9 @@ function Dashboard() {
 
         {/* Stat tiles */}
         <div className="grid gap-4 sm:grid-cols-3">
-          <StatCard icon={Film} label="Clips uploaded" value={clips.length} />
-          <StatCard icon={Users} label="Contributors" value={contributors} />
-          <StatCard icon={AlertCircle} label="Players with no footage" value={noFootageCount} accent={noFootageCount > 0} />
+          <StatCard icon={Film} label="Clips" value={clips.length} />
+          <StatCard icon={Gamepad2} label="Games" value={events.filter((e) => e.event_type === "game").length} />
+          <StatCard icon={Users} label="Players" value={activeRoster.length} />
         </div>
 
         {/* Schedule + Recap status */}
@@ -382,8 +383,10 @@ function StatCard({ icon: Icon, label, value, accent }: { icon: any; label: stri
   return (
     <Card className="p-5">
       <Icon className={`h-5 w-5 ${accent ? "text-destructive" : "text-primary"}`} />
-      <div className="mt-3 text-2xl font-bold">{value}</div>
-      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="mt-3 flex h-[60px] items-center">
+        <DotMatrixNumber value={value} scale={2} />
+      </div>
+      <div className="mt-2 text-xs text-muted-foreground">{label}</div>
     </Card>
   );
 }
