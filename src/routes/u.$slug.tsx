@@ -513,34 +513,6 @@ function ContributorUpload() {
         {phase === "upload" && (
         <div className="px-5 pt-6">
             <div className="space-y-3">
-              {supportsRecorder ? (
-                <button
-                  type="button"
-                  onClick={() => setRecording(true)}
-                  className="flex w-full cursor-pointer flex-col items-center justify-center gap-1.5 py-7 text-center"
-                  style={{ background: "var(--color-card)", border: "2px solid var(--color-border)", borderRadius: "10px" }}
-                >
-                  <Video className="h-7 w-7" style={{ color: "var(--color-accent)" }} />
-                  <span className="text-sm" style={{ color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-                    Record a clip
-                  </span>
-                  <span className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Inter', sans-serif", textTransform: "none", letterSpacing: "normal" }}>
-                    Opens your camera · No account needed
-                  </span>
-                </button>
-              ) : (
-                <label className="flex w-full cursor-pointer flex-col items-center justify-center gap-1.5 py-7 text-center"
-                  style={{ background: "var(--color-card)", border: "2px solid var(--color-border)", borderRadius: "10px" }}>
-                  <Video className="h-7 w-7" style={{ color: "var(--color-accent)" }} />
-                  <span className="text-sm" style={{ color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-                    Record a clip
-                  </span>
-                  <span className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Inter', sans-serif", textTransform: "none", letterSpacing: "normal" }}>
-                    Opens your camera · No account needed
-                  </span>
-                  <input type="file" accept="video/*" capture="environment" className="hidden" onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
-                </label>
-              )}
               <label className="flex w-full cursor-pointer flex-col items-center justify-center gap-1.5 py-7 text-center"
                 style={{ background: "var(--color-card)", border: "2px dashed var(--color-border)", borderRadius: "10px" }}>
                 <ImageIcon className="h-7 w-7" style={{ color: "var(--color-accent)" }} />
@@ -552,6 +524,24 @@ function ContributorUpload() {
                 </span>
                 <input type="file" accept="video/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
               </label>
+              {supportsRecorder ? (
+                <button
+                  type="button"
+                  onClick={() => setRecording(true)}
+                  className="flex w-full cursor-pointer items-center justify-center gap-2 py-2.5"
+                  style={{ background: "transparent", border: "1.5px solid var(--color-border)", borderRadius: "8px", color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", fontSize: "13px" }}
+                >
+                  <Video className="h-4 w-4" style={{ color: "var(--color-accent)" }} />
+                  Record a clip
+                </button>
+              ) : (
+                <label className="flex w-full cursor-pointer items-center justify-center gap-2 py-2.5"
+                  style={{ background: "transparent", border: "1.5px solid var(--color-border)", borderRadius: "8px", color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", fontSize: "13px" }}>
+                  <Video className="h-4 w-4" style={{ color: "var(--color-accent)" }} />
+                  Record a clip
+                  <input type="file" accept="video/*" capture="environment" className="hidden" onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
+                </label>
+              )}
             </div>
         </div>
         )}
