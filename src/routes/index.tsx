@@ -56,10 +56,10 @@ function Index() {
               <Sparkles className="h-4 w-4 text-primary" />
               For youth sports teams
             </div>
-            <h1 className="mt-6 text-5xl font-bold tracking-tight lg:text-6xl">
+            <h1 className="mt-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
               Your whole season,
               <br />
-              <span style={{ background: "var(--gradient-hero)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+              <span className="inline-block" style={{ background: "var(--gradient-hero)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                 from every angle.
               </span>
             </h1>
