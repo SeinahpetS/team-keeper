@@ -166,7 +166,10 @@ function Dashboard() {
       <header className="border-b bg-card/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <div>
-            <h1 className="text-xl font-bold">{team.name}</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl font-bold">{team.name}</h1>
+              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">Admin-dev</span>
+            </div>
             <p className="text-xs text-muted-foreground">{team.sport} • {team.season_year}</p>
           </div>
           <Button variant="ghost" size="sm" onClick={async () => { await supabase.auth.signOut(); navigate({ to: "/" }); }}><LogOut className="h-4 w-4" /></Button>
