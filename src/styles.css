@@ -163,3 +163,7 @@
 [role="dialog"] [role="combobox"] [data-placeholder] {
   color: #4DBF78 !important;
 }
+
+/* Keeper wordmark — green tone differs by mode */
+.keeper-wordmark__keep { color: #6DBD7E; }
+.dark .keeper-wordmark__keep { color: #4DBF78; }
