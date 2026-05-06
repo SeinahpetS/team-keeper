@@ -546,15 +546,15 @@ function ContributorUpload() {
                   type="button"
                   onClick={() => setRecording(true)}
                   className="flex w-full cursor-pointer items-center justify-center gap-2 py-3"
-                  style={{ background: "var(--color-card)", border: "1.5px solid var(--color-border)", borderRadius: "10px", color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", fontSize: "14px" }}
+                  style={{ background: "#D4A017", border: "1.5px solid #D4A017", borderRadius: "10px", color: "#2C1A00", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", fontSize: "14px" }}
                 >
-                  <Video className="h-4 w-4" style={{ color: "var(--color-accent)" }} />
+                  <Video className="h-4 w-4" style={{ color: "#2C1A00" }} />
                   Record a clip
                 </button>
               ) : (
                 <label className="flex w-full cursor-pointer items-center justify-center gap-2 py-3"
-                  style={{ background: "var(--color-card)", border: "1.5px solid var(--color-border)", borderRadius: "10px", color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", fontSize: "14px" }}>
-                  <Video className="h-4 w-4" style={{ color: "var(--color-accent)" }} />
+                  style={{ background: "#D4A017", border: "1.5px solid #D4A017", borderRadius: "10px", color: "#2C1A00", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", fontSize: "14px" }}>
+                  <Video className="h-4 w-4" style={{ color: "#2C1A00" }} />
                   Record a clip
                   <input type="file" accept="video/*" capture="environment" className="hidden" onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
                 </label>
