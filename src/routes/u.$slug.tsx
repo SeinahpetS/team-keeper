@@ -67,7 +67,7 @@ function Confetti() {
     };
     resize();
     window.addEventListener("resize", resize);
-    const colors = ["#D4A017", "#F0C84A", "#1F6E3A", "#4DBF78", "#A8DBBA", "#ffffff"];
+    const colors = ["var(--color-accent)", "var(--color-accent)", "#1F6E3A", "var(--color-muted-foreground)", "var(--color-foreground)", "#ffffff"];
     const pieces = Array.from({ length: 80 }, () => ({
       x: Math.random() * window.innerWidth,
       y: Math.random() * -window.innerHeight,
@@ -356,38 +356,38 @@ function ContributorUpload() {
   // CELEBRATION
   if (phase === "celebration") {
     return (
-      <div className="relative min-h-screen overflow-hidden" style={{ background: "#0A2517" }}>
+      <div className="relative min-h-screen overflow-hidden" style={{ background: "var(--color-background)" }}>
         <Toaster />
         <Confetti />
         <div className="relative z-20 mx-auto flex min-h-screen max-w-[390px] flex-col items-center justify-center px-6 py-10">
           <Wave />
-          <h1 className="mt-8 text-center text-4xl" style={{ color: "#F0C84A" }}>You're in the pool!</h1>
-          <p className="mt-2 text-center text-sm" style={{ color: "#4DBF78", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+          <h1 className="mt-8 text-center text-4xl" style={{ color: "var(--color-accent)" }}>You're in the pool!</h1>
+          <p className="mt-2 text-center text-sm" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase" }}>
             {team.name} · {team.season_year ?? new Date().getFullYear()}
           </p>
-          <div className="mt-8 w-full rounded-xl border p-5 text-center" style={{ background: "#0F3320", borderColor: "#1E6B3D" }}>
-            <div className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+          <div className="mt-8 w-full rounded-xl border p-5 text-center" style={{ background: "var(--color-card)", borderColor: "var(--color-border)" }}>
+            <div className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase" }}>
               Clips in the pool
             </div>
             <div className="mt-3 flex justify-center">
               <DotMatrixNumber value={displayCount} scale={2} radius={4} gap={9} />
             </div>
           </div>
-          <p className="mt-4 text-sm" style={{ fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", color: "#4DBF78" }}>
-            You've added <span style={{ color: "#F0C84A" }}>{addedToday}</span> clip{addedToday === 1 ? "" : "s"} today
+          <p className="mt-4 text-sm" style={{ fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-muted-foreground)" }}>
+            You've added <span style={{ color: "var(--color-accent)" }}>{addedToday}</span> clip{addedToday === 1 ? "" : "s"} today
           </p>
           <div className="mt-8 w-full space-y-3">
             <button
               onClick={() => { setPhase("upload"); setFile(null); setTag(""); setDuration(""); }}
               className="w-full rounded-xl py-4 text-base"
-              style={{ background: "#D4A017", color: "#2C1A00", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
+              style={{ background: "var(--color-accent)", color: "var(--color-accent-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
             >
               + Add another clip
             </button>
             <button
               onClick={() => { if (typeof window !== "undefined") window.close(); }}
               className="w-full rounded-xl border-2 py-4 text-base"
-              style={{ borderColor: "#1E6B3D", color: "#4DBF78", background: "transparent", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
+              style={{ borderColor: "var(--color-border)", color: "var(--color-muted-foreground)", background: "transparent", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
             >
               Done
             </button>
@@ -400,23 +400,23 @@ function ContributorUpload() {
   // UPLOADING
   if (phase === "uploading") {
     return (
-      <div className="min-h-screen" style={{ background: "#0A2517" }}>
-        <div className="sticky top-0 z-30 flex items-start gap-2 px-4 py-3" style={{ background: "#D4A017", color: "#2C1A00" }}>
+      <div className="min-h-screen" style={{ background: "var(--color-background)" }}>
+        <div className="sticky top-0 z-30 flex items-start gap-2 px-4 py-3" style={{ background: "var(--color-accent)", color: "var(--color-accent-foreground)" }}>
           <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
           <p className="text-sm" style={{ fontFamily: "'Inter', sans-serif", fontWeight: 600, textTransform: "none", letterSpacing: "normal" }}>
             Keep this window open until the upload is complete or your clip won't be saved.
           </p>
         </div>
         <div className="mx-auto max-w-[390px] px-6 py-8">
-          <h1 className="text-3xl" style={{ color: "#F0C84A" }}>{team.name}</h1>
-          <p className="mt-1 text-sm" style={{ color: "#4DBF78", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+          <h1 className="text-3xl" style={{ color: "var(--color-accent)" }}>{team.name}</h1>
+          <p className="mt-1 text-sm" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase" }}>
             Uploading your clip
           </p>
 
           {file && (
-            <div className="mt-6 rounded-xl border p-4" style={{ background: "#144D2E", borderColor: "#1E6B3D" }}>
-              <p className="truncate text-sm" style={{ color: "#A8DBBA", fontFamily: "'Inter', sans-serif", textTransform: "none", letterSpacing: "normal" }}>{file.name}</p>
-              <div className="mt-1 flex justify-between text-xs" style={{ color: "#4DBF78", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+            <div className="mt-6 rounded-xl border p-4" style={{ background: "var(--color-secondary)", borderColor: "var(--color-border)" }}>
+              <p className="truncate text-sm" style={{ color: "var(--color-foreground)", fontFamily: "'Inter', sans-serif", textTransform: "none", letterSpacing: "normal" }}>{file.name}</p>
+              <div className="mt-1 flex justify-between text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase" }}>
                 <span>{tag || "Untagged"}</span>
                 <span>{formatSize(file.size)}</span>
               </div>
@@ -425,14 +425,14 @@ function ContributorUpload() {
 
           <div className="mt-6">
             <div className="flex justify-between text-xs" style={{ fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase" }}>
-              <span style={{ color: "#4DBF78" }}>Uploading</span>
-              <span style={{ color: "#F0C84A" }}>{Math.floor(progress)}%</span>
+              <span style={{ color: "var(--color-muted-foreground)" }}>Uploading</span>
+              <span style={{ color: "var(--color-accent)" }}>{Math.floor(progress)}%</span>
             </div>
-            <div className="mt-2 h-[7px] w-full overflow-hidden rounded-full" style={{ background: "#1E6B3D" }}>
-              <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, background: "#D4A017" }} />
+            <div className="mt-2 h-[7px] w-full overflow-hidden rounded-full" style={{ background: "var(--color-border)" }}>
+              <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, background: "var(--color-accent)" }} />
             </div>
-            <div className="mt-3 flex items-center gap-2 text-xs" style={{ color: "#4DBF78", fontFamily: "'Inter', sans-serif", textTransform: "none", letterSpacing: "normal" }}>
-              <span className="inline-block h-2 w-2 animate-pulse rounded-full" style={{ background: "#F0C84A" }} />
+            <div className="mt-3 flex items-center gap-2 text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Inter', sans-serif", textTransform: "none", letterSpacing: "normal" }}>
+              <span className="inline-block h-2 w-2 animate-pulse rounded-full" style={{ background: "var(--color-accent)" }} />
               {statusText}
             </div>
           </div>
@@ -443,7 +443,7 @@ function ContributorUpload() {
 
   // UPLOAD (Screen 1)
   return (
-    <div className="min-h-screen" style={{ background: "#0A2517" }}>
+    <div className="min-h-screen" style={{ background: "var(--color-background)" }}>
       <Toaster />
       {(phase === "preview" || phase === "trim") && file && fileUrl && (
         <ClipPreviewOverlay
@@ -457,43 +457,43 @@ function ContributorUpload() {
       )}
       <div className="mx-auto max-w-[390px]">
         {/* Header */}
-        <div className="px-5 pt-6 pb-4" style={{ background: "#0A2517" }}>
+        <div className="px-5 pt-6 pb-4" style={{ background: "var(--color-background)" }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg" style={{ background: "#D4A017" }}>
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg" style={{ background: "var(--color-accent)" }}>
                 <Play className="h-4 w-4" style={{ color: "white", fill: "white" }} />
               </div>
-              <span className="text-xl" style={{ color: "#F0C84A" }}>Keeper</span>
+              <span className="text-xl" style={{ color: "var(--color-accent)" }}>Keeper</span>
             </div>
-            <span className="rounded-full px-3 py-1 text-[10px]" style={{ background: "#144D2E", color: "#F0C84A", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", border: "1px solid #1E6B3D" }}>
+            <span className="rounded-full px-3 py-1 text-[10px]" style={{ background: "var(--color-secondary)", color: "var(--color-accent)", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", border: "1px solid var(--color-border)" }}>
               {night ? "Night game" : "Day game"}
             </span>
           </div>
-          <Card className="mt-4 border p-4" style={{ background: "#144D2E", borderColor: "#1E6B3D" }}>
-            <p className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase" }}>Team</p>
-            <p className="text-2xl" style={{ color: "#F0C84A" }}>{team.name}</p>
-            <p className="mt-1 text-xs" style={{ color: "#4DBF78", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+          <Card className="mt-4 border p-4" style={{ background: "var(--color-secondary)", borderColor: "var(--color-border)" }}>
+            <p className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase" }}>Team</p>
+            <p className="text-2xl" style={{ color: "var(--color-accent)" }}>{team.name}</p>
+            <p className="mt-1 text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase" }}>
               Season {team.season_year ?? new Date().getFullYear()}
             </p>
           </Card>
         </div>
 
         {/* Counter strip */}
-        <div className="mx-5 flex items-center justify-center rounded-xl px-4 py-3" style={{ background: "#0F2E1A" }}>
+        <div className="mx-5 flex items-center justify-center rounded-xl px-4 py-3" style={{ background: "var(--color-card)" }}>
           <div
             style={{
               display: "inline-flex",
               flexDirection: "column",
               alignItems: "center",
               padding: "12px 16px 10px",
-              background: "#060F08",
-              border: "1.5px solid #1E6B3D",
+              background: "var(--color-background)",
+              border: "1.5px solid var(--color-border)",
               borderRadius: "6px",
             }}
           >
             <div
               style={{
-                color: "#4DBF78",
+                color: "var(--color-muted-foreground)",
                 fontFamily: "'Barlow Condensed', sans-serif",
                 fontWeight: 700,
                 letterSpacing: "0.14em",
@@ -527,36 +527,36 @@ function ContributorUpload() {
                   type="button"
                   onClick={() => setRecording(true)}
                   className="flex w-full cursor-pointer flex-col items-center justify-center gap-1.5 py-7 text-center"
-                  style={{ background: "#0F2E1A", border: "2px solid #1E6B3D", borderRadius: "10px" }}
+                  style={{ background: "var(--color-card)", border: "2px solid var(--color-border)", borderRadius: "10px" }}
                 >
-                  <Video className="h-7 w-7" style={{ color: "#F0C84A" }} />
-                  <span className="text-sm" style={{ color: "#A8DBBA", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                  <Video className="h-7 w-7" style={{ color: "var(--color-accent)" }} />
+                  <span className="text-sm" style={{ color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
                     Record a clip
                   </span>
-                  <span className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Inter', sans-serif", textTransform: "none", letterSpacing: "normal" }}>
+                  <span className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Inter', sans-serif", textTransform: "none", letterSpacing: "normal" }}>
                     Opens your camera · No account needed
                   </span>
                 </button>
               ) : (
                 <label className="flex w-full cursor-pointer flex-col items-center justify-center gap-1.5 py-7 text-center"
-                  style={{ background: "#0F2E1A", border: "2px solid #1E6B3D", borderRadius: "10px" }}>
-                  <Video className="h-7 w-7" style={{ color: "#F0C84A" }} />
-                  <span className="text-sm" style={{ color: "#A8DBBA", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                  style={{ background: "var(--color-card)", border: "2px solid var(--color-border)", borderRadius: "10px" }}>
+                  <Video className="h-7 w-7" style={{ color: "var(--color-accent)" }} />
+                  <span className="text-sm" style={{ color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
                     Record a clip
                   </span>
-                  <span className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Inter', sans-serif", textTransform: "none", letterSpacing: "normal" }}>
+                  <span className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Inter', sans-serif", textTransform: "none", letterSpacing: "normal" }}>
                     Opens your camera · No account needed
                   </span>
                   <input type="file" accept="video/*" capture="environment" className="hidden" onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
                 </label>
               )}
               <label className="flex w-full cursor-pointer flex-col items-center justify-center gap-1.5 py-7 text-center"
-                style={{ background: "#0F2E1A", border: "2px dashed #1E6B3D", borderRadius: "10px" }}>
-                <ImageIcon className="h-7 w-7" style={{ color: "#F0C84A" }} />
-                <span className="text-sm" style={{ color: "#A8DBBA", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                style={{ background: "var(--color-card)", border: "2px dashed var(--color-border)", borderRadius: "10px" }}>
+                <ImageIcon className="h-7 w-7" style={{ color: "var(--color-accent)" }} />
+                <span className="text-sm" style={{ color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
                   Choose from library
                 </span>
-                <span className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Inter', sans-serif", textTransform: "none", letterSpacing: "normal" }}>
+                <span className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Inter', sans-serif", textTransform: "none", letterSpacing: "normal" }}>
                   Pick from your camera roll
                 </span>
                 <input type="file" accept="video/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
@@ -651,7 +651,7 @@ function ClipPreviewOverlay({
         playsInline
       />
       <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-center px-5 pt-6 pb-3" style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.65), transparent)" }}>
-        <span className="text-xs" style={{ color: "#F0C84A", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" }}>
+        <span className="text-xs" style={{ color: "var(--color-accent)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" }}>
           {mode === "preview" ? "Preview your clip" : "We trimmed your clip to the key moment"}
         </span>
       </div>
@@ -661,14 +661,14 @@ function ClipPreviewOverlay({
             <button
               onClick={onConfirmClip}
               className="flex w-full items-center justify-center gap-2 rounded-xl py-4 text-base"
-              style={{ background: "#D4A017", color: "#2C1A00", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
+              style={{ background: "var(--color-accent)", color: "var(--color-accent-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
             >
               <Check className="h-5 w-5" /> This is the right clip
             </button>
             <button
               onClick={onChangeClip}
               className="w-full rounded-xl border-2 py-4 text-base"
-              style={{ borderColor: "#1E6B3D", color: "#A8DBBA", background: "transparent", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
+              style={{ borderColor: "var(--color-border)", color: "var(--color-foreground)", background: "transparent", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
             >
               Choose a different clip
             </button>
@@ -678,14 +678,14 @@ function ClipPreviewOverlay({
             <button
               onClick={onTrimGood}
               className="flex w-full items-center justify-center gap-2 rounded-xl py-4 text-base"
-              style={{ background: "#D4A017", color: "#2C1A00", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
+              style={{ background: "var(--color-accent)", color: "var(--color-accent-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
             >
               <Check className="h-5 w-5" /> Looks good
             </button>
             <button
               onClick={onTrimFlag}
               className="flex w-full items-center justify-center gap-2 rounded-xl border-2 py-4 text-base"
-              style={{ borderColor: "#1E6B3D", color: "#A8DBBA", background: "transparent", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
+              style={{ borderColor: "var(--color-border)", color: "var(--color-foreground)", background: "transparent", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
             >
               <Flag className="h-5 w-5" /> Flag for review
             </button>
@@ -699,10 +699,10 @@ function ClipPreviewOverlay({
 function StepHeader({ title, onBack }: { title: string; onBack: () => void }) {
   return (
     <div className="flex items-center gap-3 px-5 pt-6">
-      <button onClick={onBack} aria-label="Back" className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: "#144D2E", border: "1px solid #1E6B3D", color: "#A8DBBA" }}>
+      <button onClick={onBack} aria-label="Back" className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: "var(--color-secondary)", border: "1px solid var(--color-border)", color: "var(--color-foreground)" }}>
         <ArrowLeft className="h-4 w-4" />
       </button>
-      <h2 className="text-lg" style={{ color: "#F0C84A" }}>{title}</h2>
+      <h2 className="text-lg" style={{ color: "var(--color-accent)" }}>{title}</h2>
     </div>
   );
 }
@@ -713,7 +713,7 @@ function PrimaryBtn({ disabled, onClick, children }: { disabled?: boolean; onCli
       onClick={onClick}
       disabled={disabled}
       className="w-full rounded-xl py-4 text-base disabled:opacity-50"
-      style={{ background: "#D4A017", color: "#2C1A00", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
+      style={{ background: "var(--color-accent)", color: "var(--color-accent-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
     >
       {children}
     </button>
@@ -726,12 +726,12 @@ function StepEvent({ events, eventId, onChange, onBack, onNext }: {
   return (
     <div>
       <StepHeader title="Which game or event?" onBack={onBack} />
-      <p className="px-5 pt-2 text-xs" style={{ color: "#4DBF78", fontFamily: "'Inter', sans-serif" }}>
+      <p className="px-5 pt-2 text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Inter', sans-serif" }}>
         We picked the closest match based on when this clip was recorded. Change it if needed.
       </p>
       <div className="px-5 pt-4 space-y-2">
         {events.length === 0 && (
-          <p className="text-sm" style={{ color: "#A8DBBA" }}>No events on the schedule yet.</p>
+          <p className="text-sm" style={{ color: "var(--color-foreground)" }}>No events on the schedule yet.</p>
         )}
         {events.map((e) => {
           const on = eventId === e.id;
@@ -741,9 +741,9 @@ function StepEvent({ events, eventId, onChange, onBack, onNext }: {
               onClick={() => onChange(on ? null : e.id)}
               className="flex w-full items-center justify-between rounded-xl border-2 px-4 py-3 text-left"
               style={{
-                background: on ? "#D4A017" : "#144D2E",
-                borderColor: on ? "#D4A017" : "#1E6B3D",
-                color: on ? "#2C1A00" : "#A8DBBA",
+                background: on ? "var(--color-accent)" : "var(--color-secondary)",
+                borderColor: on ? "var(--color-accent)" : "var(--color-border)",
+                color: on ? "var(--color-accent-foreground)" : "var(--color-foreground)",
               }}
             >
               <div>
@@ -774,20 +774,20 @@ function StepKind({ onBack, onSelect }: { onBack: () => void; onSelect: (k: "pla
         <button
           onClick={() => onSelect("play")}
           className="flex w-full flex-col items-center justify-center gap-1 rounded-xl py-8"
-          style={{ background: "#0F2E1A", border: "2px solid #1E6B3D" }}
+          style={{ background: "var(--color-card)", border: "2px solid var(--color-border)" }}
         >
-          <Play className="h-7 w-7" style={{ color: "#F0C84A" }} />
-          <span className="text-base" style={{ color: "#A8DBBA", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>A play</span>
-          <span className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Inter', sans-serif" }}>A goal, save, or in-game moment</span>
+          <Play className="h-7 w-7" style={{ color: "var(--color-accent)" }} />
+          <span className="text-base" style={{ color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>A play</span>
+          <span className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Inter', sans-serif" }}>A goal, save, or in-game moment</span>
         </button>
         <button
           onClick={() => onSelect("broll")}
           className="flex w-full flex-col items-center justify-center gap-1 rounded-xl py-8"
-          style={{ background: "#0F2E1A", border: "2px dashed #1E6B3D" }}
+          style={{ background: "var(--color-card)", border: "2px dashed var(--color-border)" }}
         >
-          <Video className="h-7 w-7" style={{ color: "#F0C84A" }} />
-          <span className="text-base" style={{ color: "#A8DBBA", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>B-roll</span>
-          <span className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Inter', sans-serif" }}>Sideline, fans, BTS, practice</span>
+          <Video className="h-7 w-7" style={{ color: "var(--color-accent)" }} />
+          <span className="text-base" style={{ color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>B-roll</span>
+          <span className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Inter', sans-serif" }}>Sideline, fans, BTS, practice</span>
         </button>
       </div>
     </div>
@@ -819,7 +819,7 @@ function StepDetails({
 
       {kind === "broll" && (
         <div className="px-5 pt-4">
-          <p className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Type</p>
+          <p className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Type</p>
           <div className="mt-2 grid grid-cols-2 gap-2">
             {BROLL_TYPES.map((t) => {
               const on = brollType === t;
@@ -829,9 +829,9 @@ function StepDetails({
                   onClick={() => setBrollType(on ? null : t)}
                   className="rounded-xl border-2 px-3 py-3 text-sm"
                   style={{
-                    background: on ? "#D4A017" : "#144D2E",
-                    borderColor: on ? "#D4A017" : "#1E6B3D",
-                    color: on ? "#2C1A00" : "#A8DBBA",
+                    background: on ? "var(--color-accent)" : "var(--color-secondary)",
+                    borderColor: on ? "var(--color-accent)" : "var(--color-border)",
+                    color: on ? "var(--color-accent-foreground)" : "var(--color-foreground)",
                     fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
                   }}
                 >
@@ -845,10 +845,10 @@ function StepDetails({
 
       {kind === "play" && (
         <div className="px-5 pt-4">
-          <p className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Tag players with significant contribution</p>
+          <p className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Tag players with significant contribution</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {roster.length === 0 && (
-              <p className="text-sm" style={{ color: "#A8DBBA" }}>No active roster yet.</p>
+              <p className="text-sm" style={{ color: "var(--color-foreground)" }}>No active roster yet.</p>
             )}
             {roster.map((p) => {
               const on = playerIds.includes(p.id);
@@ -858,9 +858,9 @@ function StepDetails({
                   onClick={() => togglePlayer(p.id)}
                   className="rounded-full border-2 px-3 py-1.5 text-xs"
                   style={{
-                    background: on ? "#D4A017" : "#144D2E",
-                    borderColor: on ? "#D4A017" : "#1E6B3D",
-                    color: on ? "#2C1A00" : "#A8DBBA",
+                    background: on ? "var(--color-accent)" : "var(--color-secondary)",
+                    borderColor: on ? "var(--color-accent)" : "var(--color-border)",
+                    color: on ? "var(--color-accent-foreground)" : "var(--color-foreground)",
                     fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
                   }}
                 >
@@ -873,7 +873,7 @@ function StepDetails({
       )}
 
       <div className="px-5 pt-5">
-        <p className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Vibe</p>
+        <p className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Vibe</p>
         <div className="mt-2 grid grid-cols-2 gap-2">
           {vibes.map((v) => {
             const on = vibe === v;
@@ -883,9 +883,9 @@ function StepDetails({
                 onClick={() => setVibe(on ? null : v)}
                 className="rounded-xl border-2 px-3 py-3 text-sm"
                 style={{
-                  background: on ? "#D4A017" : "#144D2E",
-                  borderColor: on ? "#D4A017" : "#1E6B3D",
-                  color: on ? "#2C1A00" : "#A8DBBA",
+                  background: on ? "var(--color-accent)" : "var(--color-secondary)",
+                  borderColor: on ? "var(--color-accent)" : "var(--color-border)",
+                  color: on ? "var(--color-accent-foreground)" : "var(--color-foreground)",
                   fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
                 }}
               >
@@ -898,7 +898,7 @@ function StepDetails({
 
       <div className="px-5 pt-6 pb-6">
         <PrimaryBtn onClick={onSubmit} disabled={!canSubmit}>Submit to Pool ▶</PrimaryBtn>
-        <p className="mt-3 text-center text-xs" style={{ color: "#4DBF78", fontFamily: "'Inter', sans-serif" }}>
+        <p className="mt-3 text-center text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Inter', sans-serif" }}>
           Goes straight to the {teamName} pool · No account needed
         </p>
       </div>
@@ -993,7 +993,7 @@ function Recorder({ onCancel, onComplete }: { onCancel: () => void; onComplete: 
         </div>
       )}
       {error && (
-        <div className="absolute inset-x-6 top-1/2 z-10 -translate-y-1/2 rounded-xl p-4 text-center" style={{ background: "#0F2E1A", border: "1px solid #1E6B3D", color: "#A8DBBA" }}>
+        <div className="absolute inset-x-6 top-1/2 z-10 -translate-y-1/2 rounded-xl p-4 text-center" style={{ background: "var(--color-card)", border: "1px solid var(--color-border)", color: "var(--color-foreground)" }}>
           {error}
         </div>
       )}
@@ -1057,19 +1057,19 @@ function YourContributions({
   return (
     <div className="mt-8">
       <div className="mb-3 flex items-center justify-between">
-        <p className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" }}>
+        <p className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" }}>
           Your contributions
         </p>
         {locked && (
-          <span className="flex items-center gap-1 text-[10px]" style={{ color: "#F0C84A", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+          <span className="flex items-center gap-1 text-[10px]" style={{ color: "var(--color-accent)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>
             <Lock className="h-3 w-3" /> Compile locked
           </span>
         )}
       </div>
 
       {clips.length === 0 ? (
-        <div className="rounded-xl px-4 py-8 text-center" style={{ background: "#0F2E1A", border: "1px dashed #1E6B3D" }}>
-          <p className="text-sm" style={{ color: "#A8DBBA", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+        <div className="rounded-xl px-4 py-8 text-center" style={{ background: "var(--color-card)", border: "1px dashed var(--color-border)" }}>
+          <p className="text-sm" style={{ color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
             No clips yet — be the first to contribute
           </p>
         </div>
@@ -1087,33 +1087,33 @@ function YourContributions({
                   key={c.id}
                   onClick={() => onOpen(c.id)}
                   className="flex w-[180px] shrink-0 flex-col overflow-hidden rounded-xl text-left"
-                  style={{ background: "#0F2E1A", border: "1.5px solid #1E6B3D" }}
+                  style={{ background: "var(--color-card)", border: "1.5px solid var(--color-border)" }}
                 >
                   <div className="relative aspect-video w-full overflow-hidden" style={{ background: "#000" }}>
                     <VideoThumb url={c.file_url} />
                     {locked && (
-                      <div className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full" style={{ background: "rgba(0,0,0,0.65)", color: "#F0C84A" }}>
+                      <div className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full" style={{ background: "rgba(0,0,0,0.65)", color: "var(--color-accent)" }}>
                         <Lock className="h-3 w-3" />
                       </div>
                     )}
                     {c.flagged_for_trim_review && (
-                      <div className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px]" style={{ background: "rgba(0,0,0,0.65)", color: "#F0C84A", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                      <div className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px]" style={{ background: "rgba(0,0,0,0.65)", color: "var(--color-accent)", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase" }}>
                         <Flag className="h-2.5 w-2.5" /> Flagged
                       </div>
                     )}
                   </div>
                   <div className="p-2.5">
-                    <p className="truncate text-xs" style={{ color: "#F0C84A", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                    <p className="truncate text-xs" style={{ color: "var(--color-accent)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>
                       {eventName(c.event_id)}
                     </p>
                     <div className="mt-1.5 flex flex-wrap gap-1">
                       {tags.map((t, i) => (
-                        <span key={i} className="rounded-full px-1.5 py-0.5 text-[9px]" style={{ background: "#144D2E", color: "#A8DBBA", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", border: "1px solid #1E6B3D" }}>
+                        <span key={i} className="rounded-full px-1.5 py-0.5 text-[9px]" style={{ background: "var(--color-secondary)", color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", border: "1px solid var(--color-border)" }}>
                           {t}
                         </span>
                       ))}
                       {tags.length === 0 && (
-                        <span className="text-[10px]" style={{ color: "#4DBF78", fontFamily: "'Inter', sans-serif" }}>No tags</span>
+                        <span className="text-[10px]" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Inter', sans-serif" }}>No tags</span>
                       )}
                     </div>
                   </div>
@@ -1177,13 +1177,13 @@ function ClipDetailOverlay({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col" style={{ background: "#0A2517" }}>
+    <div className="fixed inset-0 z-50 flex flex-col" style={{ background: "var(--color-background)" }}>
       <div className="flex items-center justify-between px-5 pt-5 pb-3">
-        <button onClick={onClose} aria-label="Close" className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: "#144D2E", border: "1px solid #1E6B3D", color: "#A8DBBA" }}>
+        <button onClick={onClose} aria-label="Close" className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: "var(--color-secondary)", border: "1px solid var(--color-border)", color: "var(--color-foreground)" }}>
           <X className="h-4 w-4" />
         </button>
         {locked && (
-          <span className="flex items-center gap-1 text-[10px]" style={{ color: "#F0C84A", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+          <span className="flex items-center gap-1 text-[10px]" style={{ color: "var(--color-accent)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>
             <Lock className="h-3 w-3" /> Locked for compile
           </span>
         )}
@@ -1197,7 +1197,7 @@ function ClipDetailOverlay({
         <button
           onClick={() => setMode("preview")}
           className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border-2 py-2.5 text-xs"
-          style={{ background: mode === "preview" ? "#D4A017" : "transparent", borderColor: mode === "preview" ? "#D4A017" : "#1E6B3D", color: mode === "preview" ? "#2C1A00" : "#A8DBBA", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
+          style={{ background: mode === "preview" ? "var(--color-accent)" : "transparent", borderColor: mode === "preview" ? "var(--color-accent)" : "var(--color-border)", color: mode === "preview" ? "var(--color-accent-foreground)" : "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
         >
           <Play className="h-3.5 w-3.5" /> Preview
         </button>
@@ -1205,14 +1205,14 @@ function ClipDetailOverlay({
           onClick={() => !locked && setMode("edit")}
           disabled={locked}
           className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border-2 py-2.5 text-xs disabled:opacity-50"
-          style={{ background: mode === "edit" ? "#D4A017" : "transparent", borderColor: mode === "edit" ? "#D4A017" : "#1E6B3D", color: mode === "edit" ? "#2C1A00" : "#A8DBBA", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
+          style={{ background: mode === "edit" ? "var(--color-accent)" : "transparent", borderColor: mode === "edit" ? "var(--color-accent)" : "var(--color-border)", color: mode === "edit" ? "var(--color-accent-foreground)" : "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
         >
           <Pencil className="h-3.5 w-3.5" /> Edit tags
         </button>
         <button
           onClick={() => setMode("trim")}
           className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border-2 py-2.5 text-xs"
-          style={{ background: mode === "trim" ? "#D4A017" : "transparent", borderColor: mode === "trim" ? "#D4A017" : "#1E6B3D", color: mode === "trim" ? "#2C1A00" : "#A8DBBA", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
+          style={{ background: mode === "trim" ? "var(--color-accent)" : "transparent", borderColor: mode === "trim" ? "var(--color-accent)" : "var(--color-border)", color: mode === "trim" ? "var(--color-accent-foreground)" : "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
         >
           <Scissors className="h-3.5 w-3.5" /> View trim
         </button>
@@ -1220,12 +1220,12 @@ function ClipDetailOverlay({
 
       <div className="flex-1 overflow-y-auto px-5 pb-6 pt-4">
         {mode === "preview" && (
-          <div className="space-y-2 text-sm" style={{ color: "#A8DBBA", fontFamily: "'Inter', sans-serif" }}>
-            <p><span style={{ color: "#4DBF78" }}>Event:</span> {events.find((e) => e.id === clip.event_id)?.name ?? "Unassigned"}</p>
-            <p><span style={{ color: "#4DBF78" }}>Type:</span> {clip.content_type === "broll" ? (clip.broll_type ?? "B-roll") : "Play"}</p>
-            <p><span style={{ color: "#4DBF78" }}>Vibe:</span> {clip.vibe ?? "—"}</p>
+          <div className="space-y-2 text-sm" style={{ color: "var(--color-foreground)", fontFamily: "'Inter', sans-serif" }}>
+            <p><span style={{ color: "var(--color-muted-foreground)" }}>Event:</span> {events.find((e) => e.id === clip.event_id)?.name ?? "Unassigned"}</p>
+            <p><span style={{ color: "var(--color-muted-foreground)" }}>Type:</span> {clip.content_type === "broll" ? (clip.broll_type ?? "B-roll") : "Play"}</p>
+            <p><span style={{ color: "var(--color-muted-foreground)" }}>Vibe:</span> {clip.vibe ?? "—"}</p>
             {clip.player_tags && clip.player_tags.length > 0 && (
-              <p><span style={{ color: "#4DBF78" }}>Players:</span> {clip.player_tags.map((id) => roster.find((r) => r.id === id)?.player_name).filter(Boolean).join(", ")}</p>
+              <p><span style={{ color: "var(--color-muted-foreground)" }}>Players:</span> {clip.player_tags.map((id) => roster.find((r) => r.id === id)?.player_name).filter(Boolean).join(", ")}</p>
             )}
           </div>
         )}
@@ -1233,14 +1233,14 @@ function ClipDetailOverlay({
         {mode === "edit" && !locked && (
           <div className="space-y-5">
             <div>
-              <p className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Event</p>
+              <p className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Event</p>
               <div className="mt-2 space-y-2">
                 {events.map((e) => {
                   const on = eventId === e.id;
                   return (
                     <button key={e.id} onClick={() => setEventId(on ? null : e.id)}
                       className="flex w-full items-center justify-between rounded-xl border-2 px-3 py-2.5 text-left text-sm"
-                      style={{ background: on ? "#D4A017" : "#144D2E", borderColor: on ? "#D4A017" : "#1E6B3D", color: on ? "#2C1A00" : "#A8DBBA", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                      style={{ background: on ? "var(--color-accent)" : "var(--color-secondary)", borderColor: on ? "var(--color-accent)" : "var(--color-border)", color: on ? "var(--color-accent-foreground)" : "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>
                       <span>{e.name}</span>
                       {on && <Check className="h-4 w-4" />}
                     </button>
@@ -1249,14 +1249,14 @@ function ClipDetailOverlay({
               </div>
             </div>
             <div>
-              <p className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Content type</p>
+              <p className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Content type</p>
               <div className="mt-2 grid grid-cols-2 gap-2">
                 {(["play", "broll"] as const).map((k) => {
                   const on = contentType === k;
                   return (
                     <button key={k} onClick={() => setContentType(k)}
                       className="rounded-xl border-2 py-2.5 text-sm"
-                      style={{ background: on ? "#D4A017" : "#144D2E", borderColor: on ? "#D4A017" : "#1E6B3D", color: on ? "#2C1A00" : "#A8DBBA", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                      style={{ background: on ? "var(--color-accent)" : "var(--color-secondary)", borderColor: on ? "var(--color-accent)" : "var(--color-border)", color: on ? "var(--color-accent-foreground)" : "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
                       {k === "play" ? "Play" : "B-roll"}
                     </button>
                   );
@@ -1265,14 +1265,14 @@ function ClipDetailOverlay({
             </div>
             {contentType === "broll" && (
               <div>
-                <p className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>B-roll type</p>
+                <p className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>B-roll type</p>
                 <div className="mt-2 grid grid-cols-2 gap-2">
                   {BROLL_TYPES.map((t) => {
                     const on = brollType === t;
                     return (
                       <button key={t} onClick={() => setBrollType(on ? null : t)}
                         className="rounded-xl border-2 py-2.5 text-sm"
-                        style={{ background: on ? "#D4A017" : "#144D2E", borderColor: on ? "#D4A017" : "#1E6B3D", color: on ? "#2C1A00" : "#A8DBBA", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                        style={{ background: on ? "var(--color-accent)" : "var(--color-secondary)", borderColor: on ? "var(--color-accent)" : "var(--color-border)", color: on ? "var(--color-accent-foreground)" : "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
                         {t}
                       </button>
                     );
@@ -1282,15 +1282,15 @@ function ClipDetailOverlay({
             )}
             {contentType === "play" && (
               <div>
-                <p className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Players</p>
+                <p className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Players</p>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {roster.length === 0 && <p className="text-sm" style={{ color: "#A8DBBA" }}>No active roster.</p>}
+                  {roster.length === 0 && <p className="text-sm" style={{ color: "var(--color-foreground)" }}>No active roster.</p>}
                   {roster.map((p) => {
                     const on = playerIds.includes(p.id);
                     return (
                       <button key={p.id} onClick={() => togglePlayer(p.id)}
                         className="rounded-full border-2 px-3 py-1.5 text-xs"
-                        style={{ background: on ? "#D4A017" : "#144D2E", borderColor: on ? "#D4A017" : "#1E6B3D", color: on ? "#2C1A00" : "#A8DBBA", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                        style={{ background: on ? "var(--color-accent)" : "var(--color-secondary)", borderColor: on ? "var(--color-accent)" : "var(--color-border)", color: on ? "var(--color-accent-foreground)" : "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
                         {p.jersey_number ? `#${p.jersey_number} ` : ""}{p.player_name}
                       </button>
                     );
@@ -1299,14 +1299,14 @@ function ClipDetailOverlay({
               </div>
             )}
             <div>
-              <p className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Vibe</p>
+              <p className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Vibe</p>
               <div className="mt-2 grid grid-cols-2 gap-2">
                 {vibes.map((v) => {
                   const on = vibe === v;
                   return (
                     <button key={v} onClick={() => setVibe(on ? null : v)}
                       className="rounded-xl border-2 py-2.5 text-sm"
-                      style={{ background: on ? "#D4A017" : "#144D2E", borderColor: on ? "#D4A017" : "#1E6B3D", color: on ? "#2C1A00" : "#A8DBBA", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                      style={{ background: on ? "var(--color-accent)" : "var(--color-secondary)", borderColor: on ? "var(--color-accent)" : "var(--color-border)", color: on ? "var(--color-accent-foreground)" : "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
                       {v}
                     </button>
                   );
@@ -1318,27 +1318,27 @@ function ClipDetailOverlay({
         )}
 
         {mode === "edit" && locked && (
-          <p className="text-sm" style={{ color: "#A8DBBA" }}>This clip is locked because the admin started a compile. Tags can no longer be edited.</p>
+          <p className="text-sm" style={{ color: "var(--color-foreground)" }}>This clip is locked because the admin started a compile. Tags can no longer be edited.</p>
         )}
 
         {mode === "trim" && (
           <div className="space-y-3">
-            <p className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+            <p className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>
               AI trimmed version
             </p>
-            <p className="text-sm" style={{ color: "#A8DBBA", fontFamily: "'Inter', sans-serif" }}>
+            <p className="text-sm" style={{ color: "var(--color-foreground)", fontFamily: "'Inter', sans-serif" }}>
               {flagged ? "You've already flagged this clip for review." : "We trimmed your clip to the key moment. Confirm or flag for review."}
             </p>
             {!flagged && (
               <div className="flex gap-2">
                 <button onClick={() => { setFlagged(true); toast.success("Trim confirmed"); }}
                   className="flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm"
-                  style={{ background: "#D4A017", color: "#2C1A00", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                  style={{ background: "var(--color-accent)", color: "var(--color-accent-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
                   <Check className="h-4 w-4" /> Looks good
                 </button>
                 <button onClick={flagTrim}
                   className="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 py-3 text-sm"
-                  style={{ borderColor: "#1E6B3D", color: "#A8DBBA", background: "transparent", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                  style={{ borderColor: "var(--color-border)", color: "var(--color-foreground)", background: "transparent", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
                   <Flag className="h-4 w-4" /> Flag for review
                 </button>
               </div>
