@@ -198,11 +198,24 @@ function Dashboard() {
           </div>
         </Card>
 
-        {/* Stat tiles */}
-        <div className="grid gap-4 sm:grid-cols-3">
-          <StatCard icon={Film} label="Clips" value={clips.length} />
-          <StatCard icon={Gamepad2} label="Games" value={events.filter((e) => e.event_type === "game").length} />
-          <StatCard icon={Users} label="Players" value={activeRoster.length} />
+        {/* Dashboard header */}
+        <div>
+          <h2 className="text-3xl" style={{ color: "#D4A017", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+            {team.name}
+          </h2>
+          <p className="mt-1 text-xs" style={{ color: "#4DBF78", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+            Season {team.season_year}
+          </p>
+        </div>
+
+        {/* Scoreboard panel */}
+        <div
+          className="grid grid-cols-3 gap-4 rounded-xl px-4 py-6"
+          style={{ background: "#144D2E", border: "0.5px solid #1E6B3D" }}
+        >
+          <ScoreboardStat label="Clips" value={clips.length} />
+          <ScoreboardStat label="Games" value={events.filter((e) => e.event_type === "game").length} />
+          <ScoreboardStat label="Players" value={activeRoster.length} />
         </div>
 
         {/* Schedule + Recap status */}
@@ -277,7 +290,12 @@ function Dashboard() {
 
             <Card className="p-6">
               <h3 className="font-semibold">Season b-roll</h3>
-              <div className="mt-3 text-2xl font-bold">{brollClips.length}</div>
+              <div
+                className="mt-3 flex justify-center rounded-xl py-4"
+                style={{ background: "#144D2E", border: "0.5px solid #1E6B3D" }}
+              >
+                <DotMatrixNumber value={brollClips.length} />
+              </div>
               <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
                 {[
                   ["Team Sideline", "team_sideline"],
