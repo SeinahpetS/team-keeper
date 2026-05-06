@@ -128,7 +128,7 @@ function RecapFlow() {
       <div className="flex min-h-screen items-center justify-center px-6" style={{ background: "var(--gradient-hero)" }}>
         <div className="text-center text-primary-foreground">
           <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-white/20 backdrop-blur"><Trophy className="h-12 w-12" /></div>
-          <h1 className="mt-6 text-4xl font-bold">Recap sent! 🏆</h1>
+          <h1 className="mt-6 text-4xl font-bold">KEEPER sent! 🏆</h1>
           <p className="mt-3 text-lg opacity-90">Your team has been notified.</p>
           <div className="mt-8 rounded-xl bg-white/10 p-4 backdrop-blur">
             <div className="text-xs opacity-75">Shareable link</div>
@@ -165,11 +165,11 @@ function RecapFlow() {
               <p className="mt-1 text-sm text-muted-foreground">Sliders auto-balance to 100%. We'll flag any category bigger than your clip pool.</p>
             </div>
             <div className="space-y-2">
-              <div className="text-sm font-medium">Recap type</div>
+              <div className="text-sm font-medium">KEEPER type</div>
               <div className="grid grid-cols-2 gap-2">
                 {([
-                  { v: "tournament", l: "Tournament recap", d: "A specific tournament & nested games" },
-                  { v: "season", l: "End of season recap", d: "The full season" },
+                  { v: "tournament", l: "Tournament KEEPER", d: "A specific tournament & nested games" },
+                  { v: "season", l: "End of season KEEPER", d: "The full season" },
                 ] as const).map((t) => (
                   <button key={t.v} type="button" onClick={() => updateRecap({ recap_type: t.v })} className={`rounded-lg border-2 px-3 py-2 text-left text-sm ${recap.recap_type === t.v ? "border-primary bg-primary/10 text-primary" : "border-border"}`}>
                     <div className="font-medium">{t.l}</div>
@@ -179,7 +179,7 @@ function RecapFlow() {
               </div>
             </div>
             <div className="rounded-lg border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
-              Every compile produces <span className="font-semibold text-foreground">two outputs</span>: a 3–5 min full-length recap and a free 60–90s social cut for Instagram & TikTok.
+              Every compile produces <span className="font-semibold text-foreground">two outputs</span>: a 3–5 min full-length KEEPER and a free 60–90s social cut for Instagram & TikTok.
             </div>
             <MixSlider label="Individual plays" value={recap.mix_individual} available={playClips.length} onChange={(v) => setMix("mix_individual", v)} onCommit={saveMix} />
             <MixSlider label="Team b-roll" value={recap.mix_team_broll} available={brollClips.filter((c) => c.broll_type !== "fan_sideline").length} onChange={(v) => setMix("mix_team_broll", v)} onCommit={saveMix} />
@@ -230,7 +230,7 @@ function RecapFlow() {
             <h2 className="text-2xl font-bold">Render preview</h2>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm font-medium"><Film className="h-4 w-4 text-primary" />Full-length recap <span className="text-xs text-muted-foreground">3–5 min</span></div>
+                <div className="flex items-center gap-2 text-sm font-medium"><Film className="h-4 w-4 text-primary" />Full-length KEEPER <span className="text-xs text-muted-foreground">3–5 min</span></div>
                 {recap.video_url ? (
                   <video src={recap.video_url} controls className="aspect-video w-full rounded-lg bg-black" />
                 ) : <div className="aspect-video w-full rounded-lg bg-muted" />}
@@ -241,7 +241,7 @@ function RecapFlow() {
                 {recap.social_video_url ? (
                   <video src={recap.social_video_url} controls className="aspect-video w-full rounded-lg bg-black" />
                 ) : <div className="aspect-video w-full rounded-lg bg-muted" />}
-                <div className="text-xs text-muted-foreground">Includes a tasteful Recap watermark for sharing.</div>
+                <div className="text-xs text-muted-foreground">Includes a tasteful KEEPER watermark for sharing.</div>
               </div>
             </div>
             <p className="text-xs text-muted-foreground">Renders used: {recap.render_count} / {MAX_RENDERS}</p>
@@ -257,7 +257,7 @@ function RecapFlow() {
           <Card className="space-y-4 p-6 text-center" style={{ boxShadow: "var(--shadow-soft)" }}>
             <Sparkles className="mx-auto h-10 w-10 text-primary" />
             <h2 className="text-2xl font-bold">Send to the team?</h2>
-            <p className="text-sm text-muted-foreground">Everyone who contributed gets the recap. Make their day.</p>
+            <p className="text-sm text-muted-foreground">Everyone who contributed gets the KEEPER. Make their day.</p>
             <Button size="lg" className="w-full" style={{ background: "var(--gradient-hero)" }} onClick={() => setConfirmOpen(true)}>
               <Send className="mr-2 h-4 w-4" />Send to Team 🎉
             </Button>
@@ -268,7 +268,7 @@ function RecapFlow() {
 
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Your team is about to receive the recap</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Your team is about to receive the KEEPER</DialogTitle></DialogHeader>
           <p className="text-sm text-muted-foreground">Ready to make their day?</p>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmOpen(false)}>Not yet</Button>
