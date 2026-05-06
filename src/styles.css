@@ -129,5 +129,22 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6,
+  button,
+  .font-display {
+    font-family: 'Barlow Condensed', 'Inter', system-ui, sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* Inputs/textareas should remain in body font for legibility */
+  input, textarea, select {
+    font-family: 'Inter', system-ui, sans-serif;
+    text-transform: none;
+    letter-spacing: normal;
   }
 }
