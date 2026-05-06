@@ -13,11 +13,12 @@ const DIGITS: Record<string, number[][]> = {
   "9": [[0,1,1,0],[1,0,0,1],[0,1,1,1],[0,0,0,1],[0,1,1,0]],
 };
 
+const SEP: number[][] = [[0],[0],[0],[0],[0]];
+
 export function DotMatrixNumber({
   value,
-  dotRadius = 5,
-  gap = 11,
-  digitSpacing = 2,
+  dotRadius = 4,
+  gap = 9,
   unlitRadius,
 }: {
   value: number | string;
@@ -37,13 +38,17 @@ export function DotMatrixNumber({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const digits = String(value).split("").filter((d) => DIGITS[d]);
+    const str = String(value).padStart(2, "0");
+    const digits = str.split("").filter((d) => DIGITS[d]);
     if (digits.length === 0) return;
 
-    const totalCols = digits.reduce(
-      (a, d) => a + DIGITS[d][0].length + digitSpacing,
-      -digitSpacing,
-    );
+    const segments: { pattern: number[][]; lit: boolean }[] = [];
+    digits.forEach((d, i) => {
+      segments.push({ pattern: DIGITS[d], lit: true });
+      if (i < digits.length - 1) segments.push({ pattern: SEP, lit: false });
+    });
+
+    const totalCols = segments.reduce((a, s) => a + s.pattern[0].length, 0);
     const cssW = totalCols * gap + dotRadius * 2;
     const cssH = 5 * gap + dotRadius * 2;
 
@@ -55,24 +60,22 @@ export function DotMatrixNumber({
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, cssW, cssH);
 
-    const rUnlit = unlitRadius ?? Math.max(2, dotRadius * 0.4);
+    const rUnlit = unlitRadius ?? dotRadius * 0.35;
     let cx = 0;
-    digits.forEach((d) => {
-      const pattern = DIGITS[d];
+    segments.forEach((seg) => {
+      const p = seg.pattern;
       for (let row = 0; row < 5; row++) {
-        for (let col = 0; col < pattern[row].length; col++) {
-          const x = (cx + col) * gap + dotRadius;
-          const y = row * gap + dotRadius;
-          const lit = pattern[row][col] === 1;
+        for (let col = 0; col < p[row].length; col++) {
+          const isLit = seg.lit && p[row][col] === 1;
           ctx.beginPath();
-          ctx.arc(x, y, lit ? dotRadius : rUnlit, 0, Math.PI * 2);
-          ctx.fillStyle = lit ? "#F0C84A" : "#1E6B3D";
+          ctx.arc((cx + col) * gap + dotRadius, row * gap + dotRadius, isLit ? dotRadius : rUnlit, 0, Math.PI * 2);
+          ctx.fillStyle = isLit ? "#F0C84A" : "#1E6B3D";
           ctx.fill();
         }
       }
-      cx += pattern[0].length + digitSpacing;
+      cx += p[0].length;
     });
-  }, [value, dotRadius, gap, digitSpacing, unlitRadius]);
+  }, [value, dotRadius, gap, unlitRadius]);
 
   return <canvas ref={ref} aria-label={String(value)} style={{ display: "block" }} />;
 }
