@@ -173,7 +173,7 @@ function Onboarding() {
                 <ShieldCheck className="h-7 w-7 text-primary" />
                 <h2 className="text-2xl font-bold">Media permissions</h2>
               </div>
-              <p className="text-sm text-muted-foreground">We'll generate a permission request per player to send to their parent or guardian — required before clips of that player can appear in shared recaps.</p>
+              <p className="text-sm text-muted-foreground">We'll generate a permission request per player to send to their parent or guardian — required before clips of that player can appear in shared keepsakes.</p>
               <div className="space-y-2">
                 {players.filter((p) => p.name.trim()).map((p, i) => (
                   <div key={i} className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2 text-sm">
