@@ -54,7 +54,7 @@ function Index() {
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-card px-4 py-2 text-sm font-medium shadow-sm">
               <Sparkles className="h-4 w-4 text-primary" />
-              For youth sports teams
+              For sports teams
             </div>
             <h1 className="mt-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
               Your whole season,
