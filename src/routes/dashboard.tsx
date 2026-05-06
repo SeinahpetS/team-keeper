@@ -306,15 +306,7 @@ function Dashboard() {
             </Card>
 
             <Card className="p-6">
-              <div className="flex items-center justify-between gap-3">
-                <h3 className="font-semibold">Season b-roll</h3>
-                <div
-                  className="inline-flex items-center rounded-lg px-2.5 py-1.5"
-                  style={{ background: "#144D2E", border: "0.5px solid #1E6B3D" }}
-                >
-                  <DotMatrixNumber value={brollClips.length} dotRadius={3} gap={7} />
-                </div>
-              </div>
+              <h3 className="font-semibold">Season B-Roll</h3>
               <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
                 {[
                   ["Team Sideline", "team_sideline"],
