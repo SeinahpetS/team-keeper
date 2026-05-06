@@ -379,14 +379,13 @@ function EventRowItem({ ev, count }: { ev: EventRow; count: number }) {
   );
 }
 
-function StatCard({ icon: Icon, label, value, accent }: { icon: any; label: string; value: any; accent?: boolean }) {
+function StatCard({ label, value }: { icon?: any; label: string; value: any; accent?: boolean }) {
   return (
     <Card className="p-5">
-      <Icon className={`h-5 w-5 ${accent ? "text-destructive" : "text-primary"}`} />
-      <div className="mt-3 flex h-[60px] items-center">
-        <DotMatrixNumber value={value} scale={2} />
+      <div className="flex justify-center py-3">
+        <DotMatrixNumber value={value} />
       </div>
-      <div className="mt-2 text-xs text-muted-foreground">{label}</div>
+      <div className="mt-2 text-center text-xs text-muted-foreground">{label}</div>
     </Card>
   );
 }
