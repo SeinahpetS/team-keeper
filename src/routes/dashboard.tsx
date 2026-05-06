@@ -40,8 +40,8 @@ const EVENT_ICON: Record<string, any> = { game: Gamepad2, tournament: Trophy, pr
 
 function healthColor(count: number) {
   if (count === 0) return "bg-destructive";
-  if (count < 3) return "bg-yellow-500";
-  return "bg-green-500";
+  if (count < 3) return "bg-accent";
+  return "bg-primary";
 }
 
 function Dashboard() {
