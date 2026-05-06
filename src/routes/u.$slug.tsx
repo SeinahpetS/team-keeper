@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
-import { AlertTriangle, Play, Video, Image as ImageIcon, X, Check, Flag, ArrowLeft } from "lucide-react";
+import { AlertTriangle, Play, Video, Image as ImageIcon, X, Check, Flag, ArrowLeft, Lock, Pencil, Scissors } from "lucide-react";
 import { DotMatrixNumber } from "@/components/DotMatrixNumber";
 
 export const Route = createFileRoute("/u/$slug")({
@@ -27,6 +27,17 @@ type Phase =
 
 type EventRow = { id: string; name: string; date: string; opponent: string | null };
 type RosterRow = { id: string; player_name: string; jersey_number: string | null };
+type MyClip = {
+  id: string;
+  file_url: string;
+  content_type: string | null;
+  broll_type: string | null;
+  vibe: string | null;
+  event_id: string | null;
+  player_tags: string[] | null;
+  flagged_for_trim_review: boolean | null;
+  created_at: string;
+};
 
 function isNightMode() {
   const h = new Date().getHours() + new Date().getMinutes() / 60;
@@ -115,7 +126,7 @@ function Wave() {
 
 function ContributorUpload() {
   const { slug } = Route.useParams();
-  const [team, setTeam] = useState<{ id: string; name: string; sport: string; season_year?: number | null } | null>(null);
+  const [team, setTeam] = useState<{ id: string; name: string; sport: string; season_year?: number | null; compile_locked?: boolean } | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [poolCount, setPoolCount] = useState(0);
   const [prevPoolCount, setPrevPoolCount] = useState(0);
@@ -141,6 +152,10 @@ function ContributorUpload() {
   const [night] = useState(isNightMode());
   const [recording, setRecording] = useState(false);
   const [supportsRecorder, setSupportsRecorder] = useState(true);
+  const [myClipIds, setMyClipIds] = useState<string[]>([]);
+  const [myClips, setMyClips] = useState<MyClip[]>([]);
+  const [detailClipId, setDetailClipId] = useState<string | null>(null);
+  const [detailMode, setDetailMode] = useState<"preview" | "edit" | "trim">("preview");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -159,7 +174,7 @@ function ContributorUpload() {
     (async () => {
       const { data: t } = await supabase
         .from("teams")
-        .select("id,name,sport,season_year")
+        .select("id,name,sport,season_year,compile_locked")
         .eq("upload_slug", slug)
         .maybeSingle();
       if (!t) { setNotFound(true); return; }
@@ -179,8 +194,27 @@ function ContributorUpload() {
     if (typeof window !== "undefined") {
       const key = `keeper_added_${slug}_${new Date().toDateString()}`;
       setAddedToday(parseInt(window.localStorage.getItem(key) || "0", 10));
+      try {
+        const raw = window.localStorage.getItem(`keeper_my_clips_${slug}`);
+        const ids = raw ? (JSON.parse(raw) as string[]) : [];
+        setMyClipIds(ids);
+      } catch { /* ignore */ }
     }
   }, [slug]);
+
+  // Fetch this contributor's clips whenever the id list changes
+  useEffect(() => {
+    if (!team) return;
+    if (myClipIds.length === 0) { setMyClips([]); return; }
+    (async () => {
+      const { data } = await supabase
+        .from("clips")
+        .select("id,file_url,content_type,broll_type,vibe,event_id,player_tags,flagged_for_trim_review,created_at")
+        .in("id", myClipIds)
+        .order("created_at", { ascending: false });
+      setMyClips((data as MyClip[]) ?? []);
+    })();
+  }, [team, myClipIds]);
 
   // Cleanup blob URLs
   useEffect(() => {
@@ -263,7 +297,7 @@ function ContributorUpload() {
       const uploadPromise = supabase.storage.from("clips").upload(path, file);
       await Promise.all([uploadPromise, startProgress()]);
       const { data: pub } = supabase.storage.from("clips").getPublicUrl(path);
-      await supabase.from("clips").insert({
+      const { data: inserted } = await supabase.from("clips").insert({
         team_id: team.id,
         file_url: pub.publicUrl,
         content_type: clipKind ?? "play",
@@ -273,7 +307,12 @@ function ContributorUpload() {
         player_tags: playerIds,
         flagged_for_trim_review: flaggedTrim,
         note: tag || null,
-      });
+      }).select("id").single();
+      if (inserted?.id && typeof window !== "undefined") {
+        const next = [inserted.id, ...myClipIds];
+        setMyClipIds(next);
+        window.localStorage.setItem(`keeper_my_clips_${slug}`, JSON.stringify(next));
+      }
       const newCount = poolCount + 1;
       const isFirst = addedToday === 0;
       setPrevPoolCount(poolCount);
@@ -513,6 +552,13 @@ function ContributorUpload() {
                 <input type="file" accept="video/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
               </label>
             </div>
+            <YourContributions
+              clips={myClips}
+              events={events}
+              roster={roster}
+              locked={!!team.compile_locked}
+              onOpen={(id) => { setDetailClipId(id); setDetailMode("preview"); }}
+            />
         </div>
         )}
 
@@ -556,6 +602,24 @@ function ContributorUpload() {
           onComplete={(f) => { setRecording(false); onFile(f); }}
         />
       )}
+      {detailClipId && (() => {
+        const clip = myClips.find((c) => c.id === detailClipId);
+        if (!clip) return null;
+        return (
+          <ClipDetailOverlay
+            clip={clip}
+            mode={detailMode}
+            setMode={setDetailMode}
+            events={events}
+            roster={roster}
+            locked={!!team.compile_locked}
+            onClose={() => setDetailClipId(null)}
+            onSaved={(updated) => {
+              setMyClips((prev) => prev.map((c) => c.id === updated.id ? { ...c, ...updated } : c));
+            }}
+          />
+        );
+      })()}
     </div>
   );
 }
