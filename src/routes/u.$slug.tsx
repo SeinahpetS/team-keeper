@@ -774,7 +774,7 @@ function StepKind({ onBack, onSelect }: { onBack: () => void; onSelect: (k: "pla
         <button
           onClick={() => onSelect("broll")}
           className="flex w-full flex-col items-center justify-center gap-1 rounded-xl py-8"
-          style={{ background: "var(--color-card)", border: "2px dashed var(--color-border)" }}
+          style={{ background: "var(--color-card)", border: "2px solid var(--color-border)" }}
         >
           <Video className="h-7 w-7" style={{ color: "var(--color-accent)" }} />
           <span className="text-base" style={{ color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>B-roll</span>
@@ -1059,7 +1059,7 @@ function YourContributions({
       </div>
 
       {clips.length === 0 ? (
-        <div className="rounded-xl px-4 py-8 text-center" style={{ background: "var(--color-card)", border: "1px dashed var(--color-border)" }}>
+        <div className="rounded-xl px-4 py-8 text-center" style={{ background: "var(--color-card)", border: "1.5px solid var(--color-border)" }}>
           <p className="text-sm" style={{ color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
             No clips yet — be the first to contribute
           </p>
