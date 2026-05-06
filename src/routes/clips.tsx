@@ -12,7 +12,7 @@ export const Route = createFileRoute("/clips")({
   component: ClipsPool,
 });
 
-type Clip = { id: string; uploader_name: string | null; note: string | null; file_url: string; hearted: boolean; event_id: string | null };
+type Clip = { id: string; uploader_name: string | null; note: string | null; file_url: string; hearted: boolean; event_id: string | null; contributor_type: string | null };
 type EventRow = { id: string; name: string };
 
 function ClipsPool() {
@@ -106,7 +106,12 @@ function ClipCard({ clip, eventName, onHeart }: { clip: Clip; eventName: string;
       <video src={clip.file_url} className="aspect-video w-full bg-black object-cover" controls preload="metadata" />
       <div className="flex items-start justify-between gap-2 p-3">
         <div className="min-w-0">
-          <div className="truncate text-sm font-medium">{clip.uploader_name || "Anonymous"}</div>
+          <div className="flex items-center gap-2">
+            <div className="truncate text-sm font-medium">{clip.uploader_name || "Anonymous"}</div>
+            {clip.contributor_type && (
+              <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">{clip.contributor_type.replace("_", " ")}</span>
+            )}
+          </div>
           <div className="text-xs text-muted-foreground">{eventName}</div>
           {clip.note && <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">"{clip.note}"</p>}
         </div>
