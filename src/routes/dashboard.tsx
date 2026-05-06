@@ -428,7 +428,6 @@ function StatCard({ label, value }: { icon?: any; label: string; value: any; acc
 }
 
 function ScoreboardPanel({ teamName, season, clips, games, players }: { teamName: string; season: number; clips: number; games: number; players: number }) {
-function ScoreboardPanel({ teamName, season, clips, games, players }: { teamName: string; season: number; clips: number; games: number; players: number }) {
   const labelStyle = {
     color: "#4DBF78",
     fontFamily: "'Barlow Condensed', sans-serif",
