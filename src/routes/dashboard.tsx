@@ -490,18 +490,18 @@ function ScoreboardPanel({ teamName, season, clips, contributors, players }: { t
         KEEPER · {teamName.toUpperCase()}
       </div>
       <div className="sb-row">
-        <StatPanel value={players} label="Players" minDigits={2} />
+        <StatPanel value={clips} label="Clips" minDigits={2} />
         <div className="sb-panel sb-games">
           <div className="sb-season">
             {seasonPill}
             <div style={{ ...labelStyle, fontSize: "9px", marginTop: "2px" }}>Season</div>
           </div>
-          <div className="sb-mobile"><Dot value={clips} r={2.5} g={6} minDigits={3} /></div>
-          <div className="sb-tablet"><Dot value={clips} r={5} g={11.5} minDigits={3} /></div>
-          <div className="sb-desktop"><Dot value={clips} r={6.5} g={15} minDigits={3} /></div>
-          <div className="sb-label" style={labelStyle}>Clips</div>
+          <div className="sb-mobile"><Dot value={contributors} r={2.5} g={6} minDigits={3} /></div>
+          <div className="sb-tablet"><Dot value={contributors} r={5} g={11.5} minDigits={3} /></div>
+          <div className="sb-desktop"><Dot value={contributors} r={6.5} g={15} minDigits={3} /></div>
+          <div className="sb-label" style={labelStyle}>Contributors</div>
         </div>
-        <StatPanel value={contributors} label="Contributors" minDigits={2} />
+        <StatPanel value={players} label="Players" minDigits={2} />
       </div>
 
       <style>{`
