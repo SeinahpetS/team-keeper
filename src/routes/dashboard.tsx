@@ -35,7 +35,7 @@ type EventRow = {
 };
 type RosterRow = { id: string; player_name: string; jersey_number: string | null; permission_status: string; status: string; inactive_date: string | null };
 type ClipRow = { id: string; event_id: string | null; uploader_name: string | null; player_tags: string[]; content_type: string; broll_type: string | null; approval_status: string };
-type RecapRow = { id: string; status: string };
+type RecapRow = { id: string; status: string; social_status: string };
 
 const EVENT_ICON: Record<string, any> = { game: Gamepad2, tournament: Trophy, practice: Dumbbell, event: PartyPopper, travel: Plane };
 
@@ -66,7 +66,7 @@ function Dashboard() {
       supabase.from("schedule_events").select("*").eq("team_id", t.id).order("date"),
       supabase.from("roster").select("id,player_name,jersey_number,permission_status,status,inactive_date").eq("team_id", t.id).order("jersey_number"),
       supabase.from("clips").select("id,event_id,uploader_name,player_tags,content_type,broll_type,approval_status").eq("team_id", t.id),
-      supabase.from("recaps").select("id,status").eq("team_id", t.id).maybeSingle(),
+      supabase.from("recaps").select("id,status,social_status").eq("team_id", t.id).maybeSingle(),
     ]);
     setEvents((ev || []) as any);
     setRoster((r || []) as any);
@@ -109,13 +109,16 @@ function Dashboard() {
   const brollClips = clips.filter((c) => c.content_type === "broll");
   const brollByType = (t: string) => brollClips.filter((c) => c.broll_type === t).length;
 
-  const recapState = (() => {
-    if (!recap) return clips.length >= 5 ? "Enough to compile" : "Not started";
-    if (recap.status === "sent") return "Sent";
-    if (recap.status === "ready") return "Ready to review";
-    if (recap.status === "compiling") return "Compiling";
+  const labelFor = (s: string | undefined) => {
+    if (!s) return clips.length >= 5 ? "Enough to compile" : "Not started";
+    if (s === "sent") return "Sent";
+    if (s === "ready") return "Ready to review";
+    if (s === "compiling") return "Compiling";
+    if (s === "draft") return clips.length >= 5 ? "Enough to compile" : "Not started";
     return "Ready to review";
-  })();
+  };
+  const recapState = labelFor(recap?.status);
+  const socialState = labelFor(recap?.social_status);
 
   const uploadUrl = team ? `${typeof window !== "undefined" ? window.location.origin : ""}/u/${team.upload_slug}` : "";
 
@@ -224,8 +227,22 @@ function Dashboard() {
                 <Sparkles className="h-5 w-5 text-primary" />
                 <h3 className="font-semibold">Recap status</h3>
               </div>
-              <div className="mt-3 text-2xl font-bold">{recapState}</div>
-              <p className="mt-1 text-xs text-muted-foreground">Tap to open the compile flow.</p>
+              <div className="mt-3 space-y-2">
+                <div className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-2">
+                  <div>
+                    <div className="text-xs text-muted-foreground">Full-length</div>
+                    <div className="font-semibold">{recapState}</div>
+                  </div>
+                  <span className="text-[10px] uppercase tracking-wide text-muted-foreground">3–5 min</span>
+                </div>
+                <div className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-2">
+                  <div>
+                    <div className="text-xs text-muted-foreground">Social cut</div>
+                    <div className="font-semibold">{socialState}</div>
+                  </div>
+                  <span className="text-[10px] uppercase tracking-wide text-accent-foreground">60–90s • free</span>
+                </div>
+              </div>
               <Link to="/recap"><Button variant="outline" className="mt-4 w-full">Open recap</Button></Link>
             </Card>
 
