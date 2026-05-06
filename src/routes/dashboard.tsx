@@ -210,8 +210,8 @@ function Dashboard() {
 
         {/* Scoreboard panel */}
         <div
-          className="grid grid-cols-3 gap-4 rounded-xl px-4 py-6"
-          style={{ background: "#144D2E", border: "0.5px solid #1E6B3D" }}
+          className="grid grid-cols-3 gap-4 rounded-xl px-4"
+          style={{ background: "#144D2E", border: "0.5px solid #1E6B3D", paddingTop: 16, paddingBottom: 16 }}
         >
           <ScoreboardStat label="Clips" value={clips.length} />
           <ScoreboardStat label="Games" value={events.filter((e) => e.event_type === "game").length} />
@@ -290,11 +290,13 @@ function Dashboard() {
 
             <Card className="p-6">
               <h3 className="font-semibold">Season b-roll</h3>
-              <div
-                className="mt-3 flex justify-center rounded-xl py-4"
-                style={{ background: "#144D2E", border: "0.5px solid #1E6B3D" }}
-              >
-                <DotMatrixNumber value={brollClips.length} />
+              <div className="mt-3 flex justify-center">
+                <div
+                  className="inline-flex rounded-xl px-4 py-3"
+                  style={{ background: "#144D2E", border: "0.5px solid #1E6B3D" }}
+                >
+                  <DotMatrixNumber value={brollClips.length} />
+                </div>
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
                 {[
