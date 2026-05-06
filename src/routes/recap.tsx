@@ -260,7 +260,7 @@ function MixSlider({ label, value, available, onChange, onCommit }: { label: str
         </div>
       </div>
       <Slider value={[value]} onValueChange={([v]) => onChange(v)} onValueCommit={onCommit} min={0} max={100} step={5} />
-      {overshoot && value > 0 && <p className="text-xs text-yellow-600">Not enough clips to fill this category — consider lowering it.</p>}
+      {overshoot && value > 0 && <p className="text-xs text-accent-foreground">Not enough clips to fill this category — consider lowering it.</p>}
     </div>
   );
 }
