@@ -509,6 +509,16 @@ function ContributorUpload() {
           </div>
         </div>
 
+        <div className="px-5">
+          <YourContributions
+            clips={myClips}
+            events={events}
+            roster={roster}
+            locked={!!team.compile_locked}
+            onOpen={(id) => { setDetailClipId(id); setDetailMode("preview"); }}
+          />
+        </div>
+
         {phase === "upload" && (
         <div className="px-5 pt-6">
             <div className="space-y-3">
@@ -552,13 +562,6 @@ function ContributorUpload() {
                 <input type="file" accept="video/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
               </label>
             </div>
-            <YourContributions
-              clips={myClips}
-              events={events}
-              roster={roster}
-              locked={!!team.compile_locked}
-              onOpen={(id) => { setDetailClipId(id); setDetailMode("preview"); }}
-            />
         </div>
         )}
 
