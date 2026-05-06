@@ -408,6 +408,26 @@ function StatCard({ label, value }: { icon?: any; label: string; value: any; acc
   );
 }
 
+function ScoreboardStat({ label, value }: { label: string; value: number | string }) {
+  return (
+    <div className="flex flex-col items-center gap-3 py-2">
+      <DotMatrixNumber value={value} />
+      <span
+        className="text-xs"
+        style={{
+          color: "#4DBF78",
+          fontFamily: "'Barlow Condensed', sans-serif",
+          fontWeight: 700,
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+        }}
+      >
+        {label}
+      </span>
+    </div>
+  );
+}
+
 function AddEventDialog({ open, onOpenChange, teamId, tournaments, onAdded }: { open: boolean; onOpenChange: (b: boolean) => void; teamId: string; tournaments: EventRow[]; onAdded: () => void }) {
   const [type, setType] = useState("game");
   const [name, setName] = useState("");
