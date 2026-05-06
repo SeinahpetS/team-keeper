@@ -25,6 +25,7 @@ function ContributorUpload() {
   const [contributorType, setContributorType] = useState<string>("");
   const [linkedPlayerId, setLinkedPlayerId] = useState<string>("");
   const [intakeDone, setIntakeDone] = useState(false);
+  const [claimDone, setClaimDone] = useState(false);
   const [eventId, setEventId] = useState<string>("");
   const [note, setNote] = useState("");
   const [files, setFiles] = useState<File[]>([]);
@@ -43,8 +44,31 @@ function ContributorUpload() {
       ]);
       setEvents(ev || []);
       setRoster(r || []);
+      if (typeof window !== "undefined" && window.localStorage.getItem(`recap_claimed_${slug}`)) {
+        setClaimDone(true);
+      }
     })();
   }, [slug]);
+
+  const recordClaim = async (playerId: string) => {
+    if (!team) return;
+    await supabase.from("roster_claims").insert({
+      team_id: team.id,
+      roster_player_id: playerId,
+      claimer_name: name,
+      claimer_contact: contact || null,
+      contributor_type: contributorType,
+    });
+    setLinkedPlayerId(playerId);
+    if (typeof window !== "undefined") window.localStorage.setItem(`recap_claimed_${slug}`, playerId);
+    setClaimDone(true);
+    toast.success("Claimed — coach has been notified");
+  };
+
+  const skipClaim = () => {
+    if (typeof window !== "undefined") window.localStorage.setItem(`recap_claimed_${slug}`, "skip");
+    setClaimDone(true);
+  };
 
   const upload = async () => {
     if (!team || files.length === 0) return;
@@ -96,7 +120,7 @@ function ContributorUpload() {
       { v: "fan", l: "Fan", icon: UsersIcon },
       { v: "student_manager", l: "Student manager", icon: Megaphone },
     ];
-    const canContinue = name.trim() && contributorType && (contributorType !== "parent" || linkedPlayerId);
+    const canContinue = !!(name.trim() && contributorType);
     return (
       <div className="min-h-screen" style={{ background: "var(--gradient-warm)" }}>
         <Toaster />
@@ -124,26 +148,58 @@ function ContributorUpload() {
                   const Icon = t.icon;
                   const on = contributorType === t.v;
                   return (
-                    <button key={t.v} type="button" onClick={() => { setContributorType(t.v); if (t.v !== "parent") setLinkedPlayerId(""); }} className={`flex flex-col items-center gap-1 rounded-lg border-2 px-3 py-3 text-sm font-medium ${on ? "border-primary bg-primary/10 text-primary" : "border-border"}`}>
+                    <button key={t.v} type="button" onClick={() => setContributorType(t.v)} className={`flex flex-col items-center gap-1 rounded-lg border-2 px-3 py-3 text-sm font-medium ${on ? "border-primary bg-primary/10 text-primary" : "border-border"}`}>
                       <Icon className="h-4 w-4" />{t.l}
                     </button>
                   );
                 })}
               </div>
             </div>
-            {contributorType === "parent" && (
-              <div className="space-y-2">
-                <Label>Whose parent are you?</Label>
-                <Select value={linkedPlayerId} onValueChange={setLinkedPlayerId}>
-                  <SelectTrigger><SelectValue placeholder="Pick your player" /></SelectTrigger>
-                  <SelectContent>
-                    {roster.map((p) => <SelectItem key={p.id} value={p.id}>{p.player_name}{p.jersey_number ? ` #${p.jersey_number}` : ""}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
             <Button size="lg" className="w-full" disabled={!canContinue} onClick={() => setIntakeDone(true)}>Start uploading</Button>
           </Card>
+        </div>
+      </div>
+    );
+  }
+
+  if (!claimDone) {
+    const canClaim = contributorType === "player" || contributorType === "parent";
+    return (
+      <div className="min-h-screen" style={{ background: "var(--gradient-warm)" }}>
+        <Toaster />
+        <div className="mx-auto max-w-md px-4 py-8">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold">Do you see yourself on this team?</h1>
+            <p className="mt-2 text-muted-foreground">
+              {canClaim
+                ? contributorType === "parent"
+                  ? "Tap your player so coach knows clips of them are coming from you."
+                  : "Tap your name so coach can route footage requests straight to you."
+                : "No player to claim? No problem — your clips still count."}
+            </p>
+          </div>
+          <Card className="mt-6 p-4" style={{ boxShadow: "var(--shadow-soft)" }}>
+            {roster.length === 0 ? (
+              <p className="py-6 text-center text-sm text-muted-foreground">Roster not set up yet.</p>
+            ) : (
+              <div className="grid grid-cols-2 gap-2">
+                {roster.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => recordClaim(p.id)}
+                    className="flex items-center justify-between rounded-lg border-2 border-border px-3 py-3 text-left hover:border-primary hover:bg-primary/5"
+                  >
+                    <span className="truncate text-sm font-medium">{p.player_name}</span>
+                    {p.jersey_number && <span className="ml-2 text-xs text-muted-foreground">#{p.jersey_number}</span>}
+                  </button>
+                ))}
+              </div>
+            )}
+          </Card>
+          <Button variant="ghost" className="mt-4 w-full" onClick={skipClaim}>
+            {canClaim ? "I'm not on the roster" : "Skip — I'm just here to share clips"}
+          </Button>
         </div>
       </div>
     );
