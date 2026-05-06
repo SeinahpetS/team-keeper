@@ -55,7 +55,7 @@ export function DotMatrixNumber({
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, cssW, cssH);
 
-    const rUnlit = unlitRadius ?? dotRadius * 0.35;
+    const rUnlit = unlitRadius ?? Math.max(2, dotRadius * 0.4);
     let cx = 0;
     digits.forEach((d) => {
       const pattern = DIGITS[d];
