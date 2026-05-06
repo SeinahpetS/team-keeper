@@ -17,6 +17,40 @@ import { Copy, Film, Users, AlertCircle, Sparkles, LogOut, Image as ImageIcon, B
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { DotMatrixNumber } from "@/components/DotMatrixNumber";
 
+function useIsNight() {
+  const [night, setNight] = useState(false);
+  useEffect(() => {
+    const compute = () => {
+      const overrideDark = document.documentElement.classList.contains("dark");
+      const h = new Date().getHours() + new Date().getMinutes() / 60;
+      const auto = h >= 17.5 || h < 6;
+      setNight(overrideDark || auto);
+    };
+    compute();
+    const id = setInterval(compute, 60_000);
+    const obs = new MutationObserver(compute);
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => { clearInterval(id); obs.disconnect(); };
+  }, []);
+  return night;
+}
+
+function useDotSize() {
+  const [size, setSize] = useState({ dotRadius: 5, gap: 11 });
+  useEffect(() => {
+    const compute = () => {
+      const w = window.innerWidth;
+      if (w < 480) setSize({ dotRadius: 3, gap: 7 });
+      else if (w < 768) setSize({ dotRadius: 4, gap: 9 });
+      else setSize({ dotRadius: 5, gap: 11 });
+    };
+    compute();
+    window.addEventListener("resize", compute);
+    return () => window.removeEventListener("resize", compute);
+  }, []);
+  return size;
+}
+
 export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
 });
@@ -209,14 +243,13 @@ function Dashboard() {
         </div>
 
         {/* Scoreboard panel */}
-        <div
-          className="grid grid-cols-3 gap-4 rounded-xl px-4"
-          style={{ background: "#144D2E", border: "0.5px solid #1E6B3D", paddingTop: 16, paddingBottom: 16 }}
-        >
-          <ScoreboardStat label="Clips" value={clips.length} />
-          <ScoreboardStat label="Games" value={events.filter((e) => e.event_type === "game").length} />
-          <ScoreboardStat label="Players" value={activeRoster.length} />
-        </div>
+        <ScoreboardPanel
+          teamName={team.name}
+          season={team.season_year}
+          clips={clips.length}
+          games={events.filter((e) => e.event_type === "game").length}
+          players={activeRoster.length}
+        />
 
         {/* Schedule + Recap status */}
         <div className="grid gap-4 md:grid-cols-2">
