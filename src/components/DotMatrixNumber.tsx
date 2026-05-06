@@ -109,5 +109,12 @@ export function DotMatrixNumber({
     });
   }, [value, dotRadius, gap, unlitRadius, minDigits, litColor, litCenter, offOuter, offInner]);
 
-  return <canvas ref={ref} aria-label={String(value)} style={{ display: "block" }} />;
+  return (
+    <canvas
+      ref={ref}
+      aria-label={String(value)}
+      className="dot-matrix-canvas"
+      style={{ display: "block", maxWidth: "100%", height: "auto", margin: "0 auto" }}
+    />
+  );
 }
