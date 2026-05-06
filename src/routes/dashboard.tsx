@@ -228,10 +228,10 @@ function Dashboard() {
 
         {/* Scoreboard panel */}
         <ScoreboardPanel
-          teamName={team.name}
+          teamName="Home Team"
           season={team.season_year}
           clips={clips.length}
-          games={events.filter((e) => e.event_type === "game").length}
+          contributors={contributors}
           players={activeRoster.length}
         />
 
