@@ -524,26 +524,43 @@ function ContributorUpload() {
                 </span>
                 <input type="file" accept="video/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
               </label>
+            </div>
+            {/* spacer so content doesn't sit under the fixed Record button */}
+            <div aria-hidden style={{ height: "88px" }} />
+        </div>
+        )}
+
+        {phase === "upload" && (
+          <div
+            className="fixed inset-x-0 z-40 px-5"
+            style={{
+              bottom: 0,
+              paddingBottom: "calc(16px + env(safe-area-inset-bottom))",
+              paddingTop: "12px",
+              background: "linear-gradient(to top, var(--color-background) 70%, transparent)",
+            }}
+          >
+            <div className="mx-auto w-full max-w-[390px]">
               {supportsRecorder ? (
                 <button
                   type="button"
                   onClick={() => setRecording(true)}
-                  className="flex w-full cursor-pointer items-center justify-center gap-2 py-2.5"
-                  style={{ background: "transparent", border: "1.5px solid var(--color-border)", borderRadius: "8px", color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", fontSize: "13px" }}
+                  className="flex w-full cursor-pointer items-center justify-center gap-2 py-3"
+                  style={{ background: "var(--color-card)", border: "1.5px solid var(--color-border)", borderRadius: "10px", color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", fontSize: "14px" }}
                 >
                   <Video className="h-4 w-4" style={{ color: "var(--color-accent)" }} />
                   Record a clip
                 </button>
               ) : (
-                <label className="flex w-full cursor-pointer items-center justify-center gap-2 py-2.5"
-                  style={{ background: "transparent", border: "1.5px solid var(--color-border)", borderRadius: "8px", color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", fontSize: "13px" }}>
+                <label className="flex w-full cursor-pointer items-center justify-center gap-2 py-3"
+                  style={{ background: "var(--color-card)", border: "1.5px solid var(--color-border)", borderRadius: "10px", color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", fontSize: "14px" }}>
                   <Video className="h-4 w-4" style={{ color: "var(--color-accent)" }} />
                   Record a clip
                   <input type="file" accept="video/*" capture="environment" className="hidden" onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
                 </label>
               )}
             </div>
-        </div>
+          </div>
         )}
 
         {phase === "event" && (
