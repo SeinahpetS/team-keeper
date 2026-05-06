@@ -35,22 +35,6 @@ function useIsNight() {
   return night;
 }
 
-function useDotSize() {
-  const [size, setSize] = useState({ dotRadius: 5, gap: 11 });
-  useEffect(() => {
-    const compute = () => {
-      const w = window.innerWidth;
-      if (w < 480) setSize({ dotRadius: 3, gap: 7 });
-      else if (w < 768) setSize({ dotRadius: 4, gap: 9 });
-      else setSize({ dotRadius: 5, gap: 11 });
-    };
-    compute();
-    window.addEventListener("resize", compute);
-    return () => window.removeEventListener("resize", compute);
-  }, []);
-  return size;
-}
-
 export const Route = createFileRoute("/dashboard")({
   component: Dashboard,
 });
@@ -445,7 +429,6 @@ function StatCard({ label, value }: { icon?: any; label: string; value: any; acc
 
 function ScoreboardPanel({ teamName, season, clips, games, players }: { teamName: string; season: number; clips: number; games: number; players: number }) {
   const night = useIsNight();
-  const { dotRadius, gap } = useDotSize();
   const palette = night
     ? { outer: "#0D3320", bar: "#0A1A0F", display: "#060F08", offOuter: "#0D2018", offInner: "#112516", header: `KEEPER · ${teamName.toUpperCase()}` }
     : { outer: "#EDF7F0", bar: "#144D2E", display: "#0F2E1A", offOuter: "#1A4A2A", offInner: "#1E5530", header: "HOME TEAM" };
@@ -460,13 +443,13 @@ function ScoreboardPanel({ teamName, season, clips, games, players }: { teamName
   const headerStyle = { ...labelStyle, fontSize: "10px" };
   const Display = ({ value, big = false }: { value: number; big?: boolean }) => (
     <div
-      className="flex items-center justify-center rounded-md"
-      style={{ background: palette.display, border: "1.5px solid #1E6B3D", padding: big ? "14px 18px" : "10px 14px" }}
+      className="display-panel flex items-center justify-center rounded-md"
+      style={{ background: palette.display, border: "1.5px solid #1E6B3D", padding: big ? "14px 18px" : "10px 14px", overflow: "hidden", minWidth: 0 }}
     >
       <DotMatrixNumber
         value={value}
-        dotRadius={big ? dotRadius + 1 : dotRadius}
-        gap={big ? gap + 2 : gap}
+        dotRadius={big ? 6 : 5}
+        gap={big ? 13 : 11}
         offOuter={palette.offOuter}
         offInner={palette.offInner}
       />
