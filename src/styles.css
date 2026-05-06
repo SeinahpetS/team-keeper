@@ -148,3 +148,11 @@
     letter-spacing: normal;
   }
 }
+
+/* Off-white background for all input fields inside dialogs/popups */
+[role="dialog"] input,
+[role="dialog"] textarea,
+[role="dialog"] select,
+[role="dialog"] [role="combobox"] {
+  background-color: #FAF7EF !important;
+}
