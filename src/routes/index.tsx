@@ -100,7 +100,7 @@ function Index() {
               <button
                 type="button"
                 onClick={() => setMode(mode === "signup" ? "signin" : "signup")}
-                className="w-full text-sm text-muted-foreground hover:text-foreground"
+                className="w-full text-sm text-muted-foreground transition-colors hover:text-[#D4A017]"
               >
                 {mode === "signup" ? "Already have an account? Sign in" : "New here? Create an account"}
               </button>
