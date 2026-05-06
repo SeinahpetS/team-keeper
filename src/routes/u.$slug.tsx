@@ -149,7 +149,6 @@ function ContributorUpload() {
   const [phase, setPhase] = useState<Phase>("upload");
   const [progress, setProgress] = useState(0);
   const [statusText, setStatusText] = useState("Starting...");
-  const [night] = useState(isNightMode());
   const [recording, setRecording] = useState(false);
   const [supportsRecorder, setSupportsRecorder] = useState(true);
   const [myClipIds, setMyClipIds] = useState<string[]>([]);
@@ -163,12 +162,6 @@ function ContributorUpload() {
       !!navigator.mediaDevices?.getUserMedia;
     setSupportsRecorder(ok);
   }, []);
-
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    if (night) document.documentElement.classList.add("dark");
-    else document.documentElement.classList.remove("dark");
-  }, [night]);
 
   useEffect(() => {
     (async () => {
