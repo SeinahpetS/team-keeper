@@ -15,8 +15,8 @@ const DIGITS: Record<string, number[][]> = {
 
 export function DotMatrixNumber({
   value,
-  dotRadius = 7,
-  gap = 16,
+  dotRadius = 5,
+  gap = 11,
   digitSpacing = 2,
   unlitRadius,
 }: {
