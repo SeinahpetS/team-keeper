@@ -448,7 +448,7 @@ function ContributorUpload() {
           onTrimFlag={() => { setFlaggedTrim(true); setPhase("event"); toast.message("Flagged — admin will review the original clip."); }}
         />
       )}
-      <div className="mx-auto max-w-[390px]">
+      <div className="mx-auto flex min-h-screen max-w-[390px] flex-col pb-[180px]">
         {/* Header */}
         <div className="px-5 pt-6 pb-4" style={{ background: "var(--color-background)" }}>
           <div className="flex items-center justify-between">
@@ -459,7 +459,7 @@ function ContributorUpload() {
               <span className="text-xl" style={{ color: "var(--color-accent)" }}>Keeper</span>
             </div>
           </div>
-          <Card className="mt-4 border p-4" style={{ background: "var(--color-secondary)", borderColor: "var(--color-border)" }}>
+          <Card className="mt-4 border-2 p-4 shadow-md" style={{ background: "var(--color-card)", borderColor: "var(--color-border)" }}>
             <p className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase" }}>Team</p>
             <p className="text-2xl" style={{ color: "var(--color-accent)" }}>{team.name}</p>
             <p className="mt-1 text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase" }}>
@@ -469,7 +469,7 @@ function ContributorUpload() {
         </div>
 
         {/* Counter strip */}
-        <div className="mx-5 flex items-center justify-center rounded-xl px-4 py-3" style={{ background: "var(--color-card)" }}>
+        <div className="mx-5 flex items-center justify-center rounded-xl px-4 py-3 shadow-md" style={{ background: "var(--color-card)", border: "1.5px solid var(--color-border)" }}>
           <div
             style={{
               display: "inline-flex",
@@ -477,7 +477,7 @@ function ContributorUpload() {
               alignItems: "center",
               padding: "12px 16px 10px",
               background: "var(--color-background)",
-              border: "1.5px solid var(--color-border)",
+              border: "2px solid var(--color-border)",
               borderRadius: "6px",
             }}
           >
@@ -493,9 +493,16 @@ function ContributorUpload() {
                 marginBottom: "6px",
               }}
             >
-              Clips in Pool
+              Your Clips in Pool
             </div>
-            <DotMatrixNumber value={poolCount} dotRadius={4.5} gap={10.5} minDigits={3} />
+            <DotMatrixNumber
+              value={myClips.length}
+              dotRadius={4.5}
+              gap={10.5}
+              minDigits={3}
+              litColor="var(--color-foreground)"
+              offColor="var(--color-border)"
+            />
           </div>
         </div>
 
@@ -510,44 +517,38 @@ function ContributorUpload() {
         </div>
 
         {phase === "upload" && (
-        <div className="px-5 pt-6">
+        <div
+          className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[390px] px-5 py-4 shadow-[0_-8px_24px_rgba(0,0,0,0.25)]"
+          style={{ background: "var(--color-background)", borderTop: "1px solid var(--color-border)" }}
+        >
             <div className="space-y-3">
               {supportsRecorder ? (
                 <button
                   type="button"
                   onClick={() => setRecording(true)}
-                  className="flex w-full cursor-pointer flex-col items-center justify-center gap-1.5 py-7 text-center"
-                  style={{ background: "var(--color-card)", border: "2px solid var(--color-border)", borderRadius: "10px" }}
+                  className="flex w-full cursor-pointer flex-col items-center justify-center gap-1 py-4 text-center shadow-md"
+                  style={{ background: "var(--color-accent)", border: "2px solid var(--color-accent)", borderRadius: "10px" }}
                 >
-                  <Video className="h-7 w-7" style={{ color: "var(--color-accent)" }} />
-                  <span className="text-sm" style={{ color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                  <Video className="h-6 w-6" style={{ color: "var(--color-accent-foreground)" }} />
+                  <span className="text-sm" style={{ color: "var(--color-accent-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
                     Record a clip
-                  </span>
-                  <span className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Inter', sans-serif", textTransform: "none", letterSpacing: "normal" }}>
-                    Opens your camera · No account needed
                   </span>
                 </button>
               ) : (
-                <label className="flex w-full cursor-pointer flex-col items-center justify-center gap-1.5 py-7 text-center"
-                  style={{ background: "var(--color-card)", border: "2px solid var(--color-border)", borderRadius: "10px" }}>
-                  <Video className="h-7 w-7" style={{ color: "var(--color-accent)" }} />
-                  <span className="text-sm" style={{ color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                <label className="flex w-full cursor-pointer flex-col items-center justify-center gap-1 py-4 text-center shadow-md"
+                  style={{ background: "var(--color-accent)", border: "2px solid var(--color-accent)", borderRadius: "10px" }}>
+                  <Video className="h-6 w-6" style={{ color: "var(--color-accent-foreground)" }} />
+                  <span className="text-sm" style={{ color: "var(--color-accent-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
                     Record a clip
-                  </span>
-                  <span className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Inter', sans-serif", textTransform: "none", letterSpacing: "normal" }}>
-                    Opens your camera · No account needed
                   </span>
                   <input type="file" accept="video/*" capture="environment" className="hidden" onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
                 </label>
               )}
-              <label className="flex w-full cursor-pointer flex-col items-center justify-center gap-1.5 py-7 text-center"
-                style={{ background: "var(--color-card)", border: "2px dashed var(--color-border)", borderRadius: "10px" }}>
-                <ImageIcon className="h-7 w-7" style={{ color: "var(--color-accent)" }} />
+              <label className="flex w-full cursor-pointer flex-col items-center justify-center gap-1 py-4 text-center"
+                style={{ background: "var(--color-card)", border: "2px solid var(--color-border)", borderRadius: "10px" }}>
+                <ImageIcon className="h-6 w-6" style={{ color: "var(--color-accent)" }} />
                 <span className="text-sm" style={{ color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
                   Choose from library
-                </span>
-                <span className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Inter', sans-serif", textTransform: "none", letterSpacing: "normal" }}>
-                  Pick from your camera roll
                 </span>
                 <input type="file" accept="video/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
               </label>
@@ -773,7 +774,7 @@ function StepKind({ onBack, onSelect }: { onBack: () => void; onSelect: (k: "pla
         <button
           onClick={() => onSelect("broll")}
           className="flex w-full flex-col items-center justify-center gap-1 rounded-xl py-8"
-          style={{ background: "var(--color-card)", border: "2px dashed var(--color-border)" }}
+          style={{ background: "var(--color-card)", border: "2px solid var(--color-border)" }}
         >
           <Video className="h-7 w-7" style={{ color: "var(--color-accent)" }} />
           <span className="text-base" style={{ color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>B-roll</span>
@@ -1058,7 +1059,7 @@ function YourContributions({
       </div>
 
       {clips.length === 0 ? (
-        <div className="rounded-xl px-4 py-8 text-center" style={{ background: "var(--color-card)", border: "1px dashed var(--color-border)" }}>
+        <div className="rounded-xl px-4 py-8 text-center" style={{ background: "var(--color-card)", border: "1.5px solid var(--color-border)" }}>
           <p className="text-sm" style={{ color: "var(--color-foreground)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
             No clips yet — be the first to contribute
           </p>
