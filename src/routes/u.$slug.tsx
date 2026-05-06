@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
-import { Upload, AlertTriangle, Play, ChevronDown, ChevronUp } from "lucide-react";
+import { Upload, AlertTriangle, Play, ChevronDown, ChevronUp, Video, Image as ImageIcon, X } from "lucide-react";
 import { DotMatrixNumber } from "@/components/DotMatrixNumber";
 
 export const Route = createFileRoute("/u/$slug")({
@@ -123,6 +123,15 @@ function ContributorUpload() {
   const [progress, setProgress] = useState(0);
   const [statusText, setStatusText] = useState("Starting...");
   const [night] = useState(isNightMode());
+  const [recording, setRecording] = useState(false);
+  const [supportsRecorder, setSupportsRecorder] = useState(true);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const ok = typeof window.MediaRecorder !== "undefined" &&
+      !!navigator.mediaDevices?.getUserMedia;
+    setSupportsRecorder(ok);
+  }, []);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -450,17 +459,47 @@ function ContributorUpload() {
         {/* Upload zone */}
         <div className="px-5 pt-6">
           {!file ? (
-            <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed py-10 text-center"
-              style={{ background: "#0F3320", borderColor: "#1E6B3D" }}>
-              <Upload className="h-7 w-7" style={{ color: "#F0C84A" }} />
-              <span className="text-sm" style={{ color: "#F0C84A", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-                Tap to add your clip
-              </span>
-              <span className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Inter', sans-serif", textTransform: "none", letterSpacing: "normal" }}>
-                No account needed
-              </span>
-              <input type="file" accept="video/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
-            </label>
+            <div className="space-y-3">
+              {supportsRecorder ? (
+                <button
+                  type="button"
+                  onClick={() => setRecording(true)}
+                  className="flex w-full cursor-pointer flex-col items-center justify-center gap-1.5 py-7 text-center"
+                  style={{ background: "#0F2E1A", border: "2px solid #1E6B3D", borderRadius: "10px" }}
+                >
+                  <Video className="h-7 w-7" style={{ color: "#F0C84A" }} />
+                  <span className="text-sm" style={{ color: "#A8DBBA", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                    Record a clip
+                  </span>
+                  <span className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Inter', sans-serif", textTransform: "none", letterSpacing: "normal" }}>
+                    Opens your camera · No account needed
+                  </span>
+                </button>
+              ) : (
+                <label className="flex w-full cursor-pointer flex-col items-center justify-center gap-1.5 py-7 text-center"
+                  style={{ background: "#0F2E1A", border: "2px solid #1E6B3D", borderRadius: "10px" }}>
+                  <Video className="h-7 w-7" style={{ color: "#F0C84A" }} />
+                  <span className="text-sm" style={{ color: "#A8DBBA", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                    Record a clip
+                  </span>
+                  <span className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Inter', sans-serif", textTransform: "none", letterSpacing: "normal" }}>
+                    Opens your camera · No account needed
+                  </span>
+                  <input type="file" accept="video/*" capture="environment" className="hidden" onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
+                </label>
+              )}
+              <label className="flex w-full cursor-pointer flex-col items-center justify-center gap-1.5 py-7 text-center"
+                style={{ background: "#0F2E1A", border: "2px dashed #1E6B3D", borderRadius: "10px" }}>
+                <ImageIcon className="h-7 w-7" style={{ color: "#F0C84A" }} />
+                <span className="text-sm" style={{ color: "#A8DBBA", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                  Choose from library
+                </span>
+                <span className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Inter', sans-serif", textTransform: "none", letterSpacing: "normal" }}>
+                  Pick from your camera roll
+                </span>
+                <input type="file" accept="video/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
+              </label>
+            </div>
           ) : (
             <div className="rounded-xl border p-4" style={{ background: "#144D2E", borderColor: "#1E6B3D" }}>
               <p className="truncate text-sm" style={{ color: "#A8DBBA", fontFamily: "'Inter', sans-serif", textTransform: "none", letterSpacing: "normal" }}>{file.name}</p>
@@ -489,6 +528,126 @@ function ContributorUpload() {
             Goes straight to the {team.name} pool · No account needed
           </p>
         </div>
+      </div>
+      {recording && (
+        <Recorder
+          onCancel={() => setRecording(false)}
+          onComplete={(f) => { setRecording(false); onFile(f); }}
+        />
+      )}
+    </div>
+  );
+}
+
+function Recorder({ onCancel, onComplete }: { onCancel: () => void; onComplete: (f: File) => void }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+  const [isRecording, setIsRecording] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment" },
+          audio: true,
+        });
+        if (cancelled) { stream.getTracks().forEach((t) => t.stop()); return; }
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.play().catch(() => {});
+        }
+      } catch {
+        setError("Camera access is needed to record. Please allow camera access and try again.");
+      }
+    })();
+    return () => {
+      cancelled = true;
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isRecording) return;
+    const id = setInterval(() => setElapsed((s) => s + 1), 1000);
+    return () => clearInterval(id);
+  }, [isRecording]);
+
+  const start = () => {
+    if (!streamRef.current) return;
+    chunksRef.current = [];
+    const mimeCandidates = ["video/mp4", "video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm"];
+    const mime = mimeCandidates.find((m) => (window as any).MediaRecorder?.isTypeSupported?.(m)) || "";
+    const mr = mime ? new MediaRecorder(streamRef.current, { mimeType: mime }) : new MediaRecorder(streamRef.current);
+    mr.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
+    mr.onstop = () => {
+      const type = mr.mimeType || "video/webm";
+      const ext = type.includes("mp4") ? "mp4" : "webm";
+      const blob = new Blob(chunksRef.current, { type });
+      const file = new File([blob], `keeper-clip-${Date.now()}.${ext}`, { type });
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+      onComplete(file);
+    };
+    recorderRef.current = mr;
+    mr.start();
+    setElapsed(0);
+    setIsRecording(true);
+  };
+
+  const stop = () => {
+    recorderRef.current?.stop();
+    setIsRecording(false);
+  };
+
+  const mm = String(Math.floor(elapsed / 60)).padStart(2, "0");
+  const ss = String(elapsed % 60).padStart(2, "0");
+
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col" style={{ background: "#000" }}>
+      <video ref={videoRef} className="absolute inset-0 h-full w-full object-cover" playsInline muted />
+      <button
+        onClick={() => { recorderRef.current?.state === "recording" && recorderRef.current.stop(); streamRef.current?.getTracks().forEach((t) => t.stop()); onCancel(); }}
+        className="absolute left-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full"
+        style={{ background: "rgba(0,0,0,0.5)", color: "#fff" }}
+        aria-label="Cancel"
+      >
+        <X className="h-5 w-5" />
+      </button>
+      {isRecording && (
+        <div className="absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-full px-3 py-1 text-sm"
+          style={{ background: "rgba(0,0,0,0.6)", color: "#fff", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em" }}>
+          <span className="mr-2 inline-block h-2 w-2 animate-pulse rounded-full" style={{ background: "#ef4444" }} />
+          {mm}:{ss}
+        </div>
+      )}
+      {error && (
+        <div className="absolute inset-x-6 top-1/2 z-10 -translate-y-1/2 rounded-xl p-4 text-center" style={{ background: "#0F2E1A", border: "1px solid #1E6B3D", color: "#A8DBBA" }}>
+          {error}
+        </div>
+      )}
+      <div className="absolute inset-x-0 bottom-10 z-10 flex justify-center">
+        <button
+          onClick={isRecording ? stop : start}
+          disabled={!!error}
+          className="flex h-20 w-20 items-center justify-center rounded-full"
+          style={{ background: "rgba(255,255,255,0.2)", border: "4px solid #fff" }}
+          aria-label={isRecording ? "Stop recording" : "Start recording"}
+        >
+          <span
+            className="block transition-all"
+            style={{
+              background: "#ef4444",
+              width: isRecording ? "26px" : "56px",
+              height: isRecording ? "26px" : "56px",
+              borderRadius: isRecording ? "4px" : "9999px",
+            }}
+          />
+        </button>
       </div>
     </div>
   );
