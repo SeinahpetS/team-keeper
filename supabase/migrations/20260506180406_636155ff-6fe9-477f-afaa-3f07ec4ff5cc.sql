@@ -1,0 +1,1 @@
+ALTER TABLE public.clips ADD COLUMN IF NOT EXISTS flagged_for_trim_review boolean NOT NULL DEFAULT false;

@@ -24,6 +24,7 @@ export type Database = {
           created_at: string
           event_id: string | null
           file_url: string
+          flagged_for_trim_review: boolean
           hearted: boolean
           id: string
           note: string | null
@@ -45,6 +46,7 @@ export type Database = {
           created_at?: string
           event_id?: string | null
           file_url: string
+          flagged_for_trim_review?: boolean
           hearted?: boolean
           id?: string
           note?: string | null
@@ -66,6 +68,7 @@ export type Database = {
           created_at?: string
           event_id?: string | null
           file_url?: string
+          flagged_for_trim_review?: boolean
           hearted?: boolean
           id?: string
           note?: string | null
