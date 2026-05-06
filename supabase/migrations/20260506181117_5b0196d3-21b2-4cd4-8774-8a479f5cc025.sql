@@ -1,0 +1,1 @@
+CREATE POLICY "clips public update when unlocked" ON public.clips FOR UPDATE USING (EXISTS (SELECT 1 FROM public.teams t WHERE t.id = clips.team_id AND t.compile_locked = false)) WITH CHECK (EXISTS (SELECT 1 FROM public.teams t WHERE t.id = clips.team_id AND t.compile_locked = false));

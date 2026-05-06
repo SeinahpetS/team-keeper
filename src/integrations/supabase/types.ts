@@ -294,6 +294,7 @@ export type Database = {
       teams: {
         Row: {
           admin_id: string
+          compile_locked: boolean
           created_at: string
           id: string
           name: string
@@ -303,6 +304,7 @@ export type Database = {
         }
         Insert: {
           admin_id: string
+          compile_locked?: boolean
           created_at?: string
           id?: string
           name: string
@@ -312,6 +314,7 @@ export type Database = {
         }
         Update: {
           admin_id?: string
+          compile_locked?: boolean
           created_at?: string
           id?: string
           name?: string
