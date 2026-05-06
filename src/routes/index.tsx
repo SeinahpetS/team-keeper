@@ -59,7 +59,7 @@ function Index() {
             <h1 className="mt-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
               Your whole season,
               <br />
-              <span className="inline-block" style={{ background: "var(--gradient-hero)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+              <span className="inline-block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                 from every angle.
               </span>
             </h1>
