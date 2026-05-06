@@ -361,11 +361,34 @@ function ContributorUpload() {
         </div>
 
         {/* Counter strip */}
-        <div className="mx-5 flex items-center justify-between rounded-xl border px-4 py-3" style={{ background: "#0F3320", borderColor: "#1E6B3D" }}>
-          <span className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase" }}>
-            Clips in pool
-          </span>
-          <DotMatrixNumber value={poolCount} scale={1} radius={3} gap={6} />
+        <div className="mx-5 flex items-center justify-center rounded-xl px-4 py-3" style={{ background: "#0F2E1A" }}>
+          <div
+            style={{
+              display: "inline-flex",
+              flexDirection: "column",
+              alignItems: "center",
+              padding: "12px 16px 10px",
+              background: "#060F08",
+              border: "1.5px solid #1E6B3D",
+              borderRadius: "6px",
+            }}
+          >
+            <div
+              style={{
+                color: "#4DBF78",
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 700,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                fontSize: "11px",
+                textAlign: "center",
+                marginBottom: "6px",
+              }}
+            >
+              Clips in Pool
+            </div>
+            <DotMatrixNumber value={poolCount} dotRadius={4.5} gap={10.5} minDigits={3} />
+          </div>
         </div>
 
         {/* Tag picker */}
