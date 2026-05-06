@@ -74,5 +74,5 @@ export function DotMatrixNumber({
     });
   }, [value, dotRadius, gap, digitSpacing, unlitRadius]);
 
-  return <canvas ref={ref} aria-label={String(value)} />;
+  return <canvas ref={ref} aria-label={String(value)} style={{ display: "block" }} />;
 }
