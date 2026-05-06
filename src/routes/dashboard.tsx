@@ -16,6 +16,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { Copy, Film, Users, AlertCircle, Sparkles, LogOut, Image as ImageIcon, Bell, UserPlus, CalendarPlus, ChevronRight, Trophy, Plane, Dumbbell, PartyPopper, Gamepad2, Archive, EyeOff, Plus, User, Heart, X } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { DotMatrixNumber } from "@/components/DotMatrixNumber";
+import { KeeperWordmark } from "@/components/KeeperWordmark";
 
 function useIsNight() {
   const [night, setNight] = useState(false);
@@ -486,8 +487,9 @@ function ScoreboardPanel({ teamName, season, clips, contributors, players }: { t
       className="sb-bar"
       style={{ background: "#0A1A0F", borderRadius: "12px", padding: "16px" }}
     >
-      <div className="sb-header" style={headerStyle}>
-        KEEPER · {teamName.toUpperCase()}
+      <div className="sb-header" style={{ ...headerStyle, display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+        <KeeperWordmark size="sm" />
+        <span>· {teamName.toUpperCase()}</span>
       </div>
       <div className="sb-row">
         <StatPanel value={clips} label="Clips" minDigits={2} />

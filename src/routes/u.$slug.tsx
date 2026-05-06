@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { AlertTriangle, Play, Video, Image as ImageIcon, X, Check, Flag, ArrowLeft, Lock, Pencil, Scissors } from "lucide-react";
 import { DotMatrixNumber } from "@/components/DotMatrixNumber";
+import { KeeperWordmark } from "@/components/KeeperWordmark";
 
 export const Route = createFileRoute("/u/$slug")({
   component: ContributorUpload,
@@ -456,7 +457,7 @@ function ContributorUpload() {
               <div className="flex h-9 w-9 items-center justify-center rounded-lg" style={{ background: "var(--color-accent)" }}>
                 <Play className="h-4 w-4" style={{ color: "white", fill: "white" }} />
               </div>
-              <span className="text-xl" style={{ color: "var(--color-accent)" }}>Keeper</span>
+              <KeeperWordmark size="lg" />
             </div>
           </div>
           <Card className="mt-4 border p-4" style={{ background: "var(--color-secondary)", borderColor: "var(--color-border)" }}>
