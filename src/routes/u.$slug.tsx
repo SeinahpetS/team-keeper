@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { AlertTriangle, Play, Video, Image as ImageIcon, X, Check, Flag, ArrowLeft, Lock, Pencil, Scissors } from "lucide-react";
 import { DotMatrixNumber } from "@/components/DotMatrixNumber";
+import { KeeperWordmark } from "@/components/KeeperWordmark";
 
 export const Route = createFileRoute("/u/$slug")({
   component: ContributorUpload,
