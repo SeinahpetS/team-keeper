@@ -114,7 +114,7 @@ export function DotMatrixNumber({
       ref={ref}
       aria-label={String(value)}
       className="dot-matrix-canvas"
-      style={{ display: "block", maxWidth: "100%", height: "auto", margin: "0 auto" }}
+      style={{ display: "block" }}
     />
   );
 }
