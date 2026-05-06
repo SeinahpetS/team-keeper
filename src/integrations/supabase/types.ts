@@ -19,6 +19,8 @@ export type Database = {
           approval_status: string
           broll_type: string | null
           content_type: string
+          contributor_player_id: string | null
+          contributor_type: string | null
           created_at: string
           event_id: string | null
           file_url: string
@@ -38,6 +40,8 @@ export type Database = {
           approval_status?: string
           broll_type?: string | null
           content_type?: string
+          contributor_player_id?: string | null
+          contributor_type?: string | null
           created_at?: string
           event_id?: string | null
           file_url: string
@@ -57,6 +61,8 @@ export type Database = {
           approval_status?: string
           broll_type?: string | null
           content_type?: string
+          contributor_player_id?: string | null
+          contributor_type?: string | null
           created_at?: string
           event_id?: string | null
           file_url?: string
@@ -100,6 +106,8 @@ export type Database = {
           recap_type: string
           render_count: number
           sent_at: string | null
+          social_status: string
+          social_video_url: string | null
           status: string
           team_id: string
           video_url: string | null
@@ -114,6 +122,8 @@ export type Database = {
           recap_type?: string
           render_count?: number
           sent_at?: string | null
+          social_status?: string
+          social_video_url?: string | null
           status?: string
           team_id: string
           video_url?: string | null
@@ -128,6 +138,8 @@ export type Database = {
           recap_type?: string
           render_count?: number
           sent_at?: string | null
+          social_status?: string
+          social_video_url?: string | null
           status?: string
           team_id?: string
           video_url?: string | null
@@ -146,28 +158,34 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          inactive_date: string | null
           jersey_number: string | null
           permission_status: string
           photo_url: string | null
           player_name: string
+          status: string
           team_id: string
         }
         Insert: {
           created_at?: string
           id?: string
+          inactive_date?: string | null
           jersey_number?: string | null
           permission_status?: string
           photo_url?: string | null
           player_name: string
+          status?: string
           team_id: string
         }
         Update: {
           created_at?: string
           id?: string
+          inactive_date?: string | null
           jersey_number?: string | null
           permission_status?: string
           photo_url?: string | null
           player_name?: string
+          status?: string
           team_id?: string
         }
         Relationships: [
