@@ -252,7 +252,7 @@ function Dashboard() {
             {roster.map((p) => {
               const hasTagged = playersWithFootage.has(p.player_name.toLowerCase());
               const hasMention = playersWithMentions.has(p.player_name.toLowerCase());
-              const color = hasTagged ? "border-green-500 bg-green-500/10" : hasMention ? "border-yellow-500 bg-yellow-500/10" : "border-destructive bg-destructive/10";
+              const color = hasTagged ? "border-primary bg-primary/10" : hasMention ? "border-accent bg-accent/10" : "border-destructive bg-destructive/10";
               return (
                 <button key={p.id} onClick={() => requestPlayerFootage(p.player_name)} className={`flex items-center justify-between rounded-lg border-2 px-3 py-2 text-left text-sm hover:opacity-80 ${color}`}>
                   <span className="truncate font-medium">{p.player_name}</span>
