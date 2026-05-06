@@ -149,10 +149,17 @@
   }
 }
 
-/* Off-white background for all input fields inside dialogs/popups */
+/* Dark green background for all input fields inside dialogs/popups */
 [role="dialog"] input,
 [role="dialog"] textarea,
 [role="dialog"] select,
 [role="dialog"] [role="combobox"] {
-  background-color: #FAF7EF !important;
+  background-color: #144D2E !important;
+  color: #FAF7EF !important;
+  border-color: #1E6B3D !important;
+}
+[role="dialog"] input::placeholder,
+[role="dialog"] textarea::placeholder,
+[role="dialog"] [role="combobox"] [data-placeholder] {
+  color: #4DBF78 !important;
 }
