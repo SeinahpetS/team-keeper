@@ -208,9 +208,9 @@ function Dashboard() {
               <div className="mt-4 flex gap-2">
                 <code className="flex-1 truncate rounded-lg bg-muted px-3 py-2 text-sm">{uploadUrl}</code>
                 <Button onClick={() => { navigator.clipboard.writeText(uploadUrl); toast.success("Copied!"); }}><Copy className="h-4 w-4" /></Button>
-                <Button variant="outline" onClick={() => window.open(`/u/${team.upload_slug}`, "_blank")}>
-                  Preview
-                </Button>
+                <Link to="/u/$slug" params={{ slug: team.upload_slug }}>
+                  <Button variant="outline">Preview</Button>
+                </Link>
               </div>
             </div>
             <div className="rounded-2xl bg-card p-4 shadow-sm">
