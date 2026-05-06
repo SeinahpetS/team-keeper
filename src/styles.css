@@ -23,4 +23,111 @@
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
-  --color-mut
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  --radius: 0.875rem;
+
+  /* Day game — green leads, gold accents */
+  --background: oklch(0.97 0.02 145);        /* #EDF7F0 soft green white */
+  --foreground: oklch(0.18 0.07 145);        /* #0F2E1A deep green text */
+  --card: oklch(1 0 0);                       /* white */
+  --card-foreground: oklch(0.18 0.07 145);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.07 145);
+  --primary: oklch(0.42 0.13 145);           /* #1F6E3A keeper green */
+  --primary-foreground: oklch(1 0 0);        /* white text on green */
+  --secondary: oklch(0.94 0.03 145);         /* #EDF7F0 light green surface */
+  --secondary-foreground: oklch(0.25 0.09 145);
+  --muted: oklch(0.93 0.025 145);
+  --muted-foreground: oklch(0.45 0.07 145);  /* #2A7A47 mid green */
+  --accent: oklch(0.70 0.16 75);             /* #D4A017 keeper gold */
+  --accent-foreground: oklch(0.18 0.08 75);  /* #2C1A00 dark gold text */
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(0.83 0.06 145);            /* #BDE3CB green border */
+  --input: oklch(0.88 0.04 145);
+  --ring: oklch(0.42 0.13 145);              /* keeper green */
+  --chart-1: oklch(0.42 0.13 145);
+  --chart-2: oklch(0.70 0.16 75);
+  --chart-3: oklch(0.55 0.12 145);
+  --chart-4: oklch(0.60 0.14 75);
+  --chart-5: oklch(0.35 0.10 145);
+  --sidebar: oklch(0.97 0.02 145);
+  --sidebar-foreground: oklch(0.18 0.07 145);
+  --sidebar-primary: oklch(0.42 0.13 145);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.94 0.03 145);
+  --sidebar-accent-foreground: oklch(0.25 0.09 145);
+  --sidebar-border: oklch(0.83 0.06 145);
+  --sidebar-ring: oklch(0.42 0.13 145);
+}
+
+.dark {
+  /* Night game — dark green, gold text */
+  --background: oklch(0.22 0.07 145);        /* #0D3320 dark green bg */
+  --foreground: oklch(0.88 0.05 145);        /* #A8DBBA light green text */
+  --card: oklch(0.28 0.08 145);              /* #144D2E green surface */
+  --card-foreground: oklch(0.88 0.05 145);
+  --popover: oklch(0.28 0.08 145);
+  --popover-foreground: oklch(0.88 0.05 145);
+  --primary: oklch(0.70 0.16 75);            /* #D4A017 gold as primary CTA in night */
+  --primary-foreground: oklch(0.18 0.08 75); /* dark gold text */
+  --secondary: oklch(0.28 0.08 145);
+  --secondary-foreground: oklch(0.88 0.05 145);
+  --muted: oklch(0.28 0.08 145);
+  --muted-foreground: oklch(0.65 0.12 145);  /* #4DBF78 bright green text */
+  --accent: oklch(0.70 0.16 75);             /* gold accent */
+  --accent-foreground: oklch(0.18 0.08 75);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(0.35 0.09 145);            /* #1E6B3D green border */
+  --input: oklch(0.32 0.08 145);
+  --ring: oklch(0.70 0.16 75);               /* gold ring */
+  --chart-1: oklch(0.65 0.12 145);
+  --chart-2: oklch(0.70 0.16 75);
+  --chart-3: oklch(0.50 0.10 145);
+  --chart-4: oklch(0.60 0.14 75);
+  --chart-5: oklch(0.40 0.08 145);
+  --sidebar: oklch(0.22 0.07 145);
+  --sidebar-foreground: oklch(0.88 0.05 145);
+  --sidebar-primary: oklch(0.70 0.16 75);
+  --sidebar-primary-foreground: oklch(0.18 0.08 75);
+  --sidebar-accent: oklch(0.28 0.08 145);
+  --sidebar-accent-foreground: oklch(0.88 0.05 145);
+  --sidebar-border: oklch(0.35 0.09 145);
+  --sidebar-ring: oklch(0.70 0.16 75);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+}
