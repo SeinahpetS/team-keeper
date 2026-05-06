@@ -407,6 +407,16 @@ function ContributorUpload() {
   return (
     <div className="min-h-screen" style={{ background: "#0A2517" }}>
       <Toaster />
+      {(phase === "preview" || phase === "trim") && file && fileUrl && (
+        <ClipPreviewOverlay
+          fileUrl={fileUrl}
+          mode={phase}
+          onConfirmClip={() => setPhase("trim")}
+          onChangeClip={() => { resetFlow(); setPhase("upload"); }}
+          onTrimGood={() => { setFlaggedTrim(false); setPhase("event"); }}
+          onTrimFlag={() => { setFlaggedTrim(true); setPhase("event"); toast.message("Flagged — admin will review the original clip."); }}
+        />
+      )}
       <div className="mx-auto max-w-[390px]">
         {/* Header */}
         <div className="px-5 pt-6 pb-4" style={{ background: "#0A2517" }}>
@@ -461,65 +471,8 @@ function ContributorUpload() {
           </div>
         </div>
 
-        {/* Tag picker */}
+        {phase === "upload" && (
         <div className="px-5 pt-6">
-          <p className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase" }}>Tag your clip</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {TOP_TAGS.map((t) => {
-              const on = tag === t;
-              return (
-                <button
-                  key={t}
-                  onClick={() => setTag(on ? "" : t)}
-                  className="rounded-full border px-3 py-1.5 text-xs"
-                  style={{
-                    background: on ? "#D4A017" : "#144D2E",
-                    color: on ? "#2C1A00" : "#4DBF78",
-                    borderColor: on ? "#D4A017" : "#1E6B3D",
-                    fontFamily: "'Barlow Condensed', sans-serif",
-                    fontWeight: 700,
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {t}
-                </button>
-              );
-            })}
-            <button
-              onClick={() => setMoreOpen((o) => !o)}
-              className="inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs"
-              style={{ background: "#144D2E", color: "#4DBF78", borderColor: "#1E6B3D", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
-            >
-              {moreOpen ? <><ChevronUp className="h-3 w-3" />Less</> : <><ChevronDown className="h-3 w-3" />More tags</>}
-            </button>
-            {moreOpen && MORE_TAGS.map((t) => {
-              const on = tag === t;
-              return (
-                <button
-                  key={t}
-                  onClick={() => setTag(on ? "" : t)}
-                  className="rounded-full border px-3 py-1.5 text-xs"
-                  style={{
-                    background: on ? "#D4A017" : "#144D2E",
-                    color: on ? "#2C1A00" : "#4DBF78",
-                    borderColor: on ? "#D4A017" : "#1E6B3D",
-                    fontFamily: "'Barlow Condensed', sans-serif",
-                    fontWeight: 700,
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {t}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Upload zone */}
-        <div className="px-5 pt-6">
-          {!file ? (
             <div className="space-y-3">
               {supportsRecorder ? (
                 <button
@@ -561,34 +514,42 @@ function ContributorUpload() {
                 <input type="file" accept="video/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
               </label>
             </div>
-          ) : (
-            <div className="rounded-xl border p-4" style={{ background: "#144D2E", borderColor: "#1E6B3D" }}>
-              <p className="truncate text-sm" style={{ color: "#A8DBBA", fontFamily: "'Inter', sans-serif", textTransform: "none", letterSpacing: "normal" }}>{file.name}</p>
-              <div className="mt-1 flex items-center justify-between text-xs" style={{ color: "#4DBF78", fontFamily: "'Inter', sans-serif", textTransform: "none", letterSpacing: "normal" }}>
-                <span>{duration && `${duration} · `}{formatSize(file.size)}</span>
-                <label className="cursor-pointer underline" style={{ color: "#F0C84A" }}>
-                  Change
-                  <input type="file" accept="video/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
-                </label>
-              </div>
-            </div>
-          )}
         </div>
+        )}
 
-        {/* CTA */}
-        <div className="px-5 pt-6 pb-4">
-          <button
-            onClick={submit}
-            disabled={!file}
-            className="w-full rounded-xl py-4 text-base disabled:opacity-50"
-            style={{ background: "#D4A017", color: "#2C1A00", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
-          >
-            Submit to Pool ▶
-          </button>
-          <p className="mt-3 text-center text-xs" style={{ color: "#4DBF78", fontFamily: "'Inter', sans-serif", textTransform: "none", letterSpacing: "normal" }}>
-            Goes straight to the {team.name} pool · No account needed
-          </p>
-        </div>
+        {phase === "event" && (
+          <StepEvent
+            events={events}
+            eventId={eventId}
+            onChange={setEventId}
+            onBack={() => setPhase("trim")}
+            onNext={() => setPhase("kind")}
+          />
+        )}
+
+        {phase === "kind" && (
+          <StepKind
+            onBack={() => setPhase("event")}
+            onSelect={(k) => { setClipKind(k); setBrollType(null); setVibe(null); setPhase("details"); }}
+          />
+        )}
+
+        {phase === "details" && clipKind && (
+          <StepDetails
+            kind={clipKind}
+            roster={roster}
+            playerIds={playerIds}
+            setPlayerIds={setPlayerIds}
+            brollType={brollType}
+            setBrollType={setBrollType}
+            vibe={vibe}
+            setVibe={setVibe}
+            teamName={team.name}
+            onBack={() => setPhase("kind")}
+            onSubmit={submit}
+            canSubmit={Boolean(vibe) && (clipKind === "play" ? true : Boolean(brollType))}
+          />
+        )}
       </div>
       {recording && (
         <Recorder
@@ -596,6 +557,285 @@ function ContributorUpload() {
           onComplete={(f) => { setRecording(false); onFile(f); }}
         />
       )}
+    </div>
+  );
+}
+
+/* ---------- Step components ---------- */
+
+function ClipPreviewOverlay({
+  fileUrl, mode, onConfirmClip, onChangeClip, onTrimGood, onTrimFlag,
+}: {
+  fileUrl: string;
+  mode: "preview" | "trim";
+  onConfirmClip: () => void;
+  onChangeClip: () => void;
+  onTrimGood: () => void;
+  onTrimFlag: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col" style={{ background: "#000" }}>
+      <video
+        key={mode}
+        src={fileUrl}
+        className="absolute inset-0 h-full w-full object-contain"
+        autoPlay
+        loop
+        muted
+        playsInline
+      />
+      <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-center px-5 pt-6 pb-3" style={{ background: "linear-gradient(180deg, rgba(0,0,0,0.65), transparent)" }}>
+        <span className="text-xs" style={{ color: "#F0C84A", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" }}>
+          {mode === "preview" ? "Preview your clip" : "We trimmed your clip to the key moment"}
+        </span>
+      </div>
+      <div className="absolute inset-x-0 bottom-0 z-10 space-y-3 px-5 pb-8 pt-10" style={{ background: "linear-gradient(0deg, rgba(0,0,0,0.75), transparent)" }}>
+        {mode === "preview" ? (
+          <>
+            <button
+              onClick={onConfirmClip}
+              className="flex w-full items-center justify-center gap-2 rounded-xl py-4 text-base"
+              style={{ background: "#D4A017", color: "#2C1A00", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
+            >
+              <Check className="h-5 w-5" /> This is the right clip
+            </button>
+            <button
+              onClick={onChangeClip}
+              className="w-full rounded-xl border-2 py-4 text-base"
+              style={{ borderColor: "#1E6B3D", color: "#A8DBBA", background: "transparent", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
+            >
+              Choose a different clip
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={onTrimGood}
+              className="flex w-full items-center justify-center gap-2 rounded-xl py-4 text-base"
+              style={{ background: "#D4A017", color: "#2C1A00", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
+            >
+              <Check className="h-5 w-5" /> Looks good
+            </button>
+            <button
+              onClick={onTrimFlag}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border-2 py-4 text-base"
+              style={{ borderColor: "#1E6B3D", color: "#A8DBBA", background: "transparent", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
+            >
+              <Flag className="h-5 w-5" /> Flag for review
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function StepHeader({ title, onBack }: { title: string; onBack: () => void }) {
+  return (
+    <div className="flex items-center gap-3 px-5 pt-6">
+      <button onClick={onBack} aria-label="Back" className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: "#144D2E", border: "1px solid #1E6B3D", color: "#A8DBBA" }}>
+        <ArrowLeft className="h-4 w-4" />
+      </button>
+      <h2 className="text-lg" style={{ color: "#F0C84A" }}>{title}</h2>
+    </div>
+  );
+}
+
+function PrimaryBtn({ disabled, onClick, children }: { disabled?: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className="w-full rounded-xl py-4 text-base disabled:opacity-50"
+      style={{ background: "#D4A017", color: "#2C1A00", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function StepEvent({ events, eventId, onChange, onBack, onNext }: {
+  events: EventRow[]; eventId: string | null; onChange: (id: string | null) => void; onBack: () => void; onNext: () => void;
+}) {
+  return (
+    <div>
+      <StepHeader title="Which game or event?" onBack={onBack} />
+      <p className="px-5 pt-2 text-xs" style={{ color: "#4DBF78", fontFamily: "'Inter', sans-serif" }}>
+        We picked the closest match based on when this clip was recorded. Change it if needed.
+      </p>
+      <div className="px-5 pt-4 space-y-2">
+        {events.length === 0 && (
+          <p className="text-sm" style={{ color: "#A8DBBA" }}>No events on the schedule yet.</p>
+        )}
+        {events.map((e) => {
+          const on = eventId === e.id;
+          return (
+            <button
+              key={e.id}
+              onClick={() => onChange(on ? null : e.id)}
+              className="flex w-full items-center justify-between rounded-xl border-2 px-4 py-3 text-left"
+              style={{
+                background: on ? "#D4A017" : "#144D2E",
+                borderColor: on ? "#D4A017" : "#1E6B3D",
+                color: on ? "#2C1A00" : "#A8DBBA",
+              }}
+            >
+              <div>
+                <div className="text-sm" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                  {e.name}{e.opponent ? ` vs ${e.opponent}` : ""}
+                </div>
+                <div className="text-xs" style={{ fontFamily: "'Inter', sans-serif" }}>
+                  {new Date(e.date).toLocaleDateString()}
+                </div>
+              </div>
+              {on && <Check className="h-5 w-5" />}
+            </button>
+          );
+        })}
+      </div>
+      <div className="px-5 pt-6 pb-6">
+        <PrimaryBtn onClick={onNext}>Continue ▶</PrimaryBtn>
+      </div>
+    </div>
+  );
+}
+
+function StepKind({ onBack, onSelect }: { onBack: () => void; onSelect: (k: "play" | "broll") => void }) {
+  return (
+    <div>
+      <StepHeader title="What's in this clip?" onBack={onBack} />
+      <div className="px-5 pt-4 space-y-3">
+        <button
+          onClick={() => onSelect("play")}
+          className="flex w-full flex-col items-center justify-center gap-1 rounded-xl py-8"
+          style={{ background: "#0F2E1A", border: "2px solid #1E6B3D" }}
+        >
+          <Play className="h-7 w-7" style={{ color: "#F0C84A" }} />
+          <span className="text-base" style={{ color: "#A8DBBA", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>A play</span>
+          <span className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Inter', sans-serif" }}>A goal, save, or in-game moment</span>
+        </button>
+        <button
+          onClick={() => onSelect("broll")}
+          className="flex w-full flex-col items-center justify-center gap-1 rounded-xl py-8"
+          style={{ background: "#0F2E1A", border: "2px dashed #1E6B3D" }}
+        >
+          <Video className="h-7 w-7" style={{ color: "#F0C84A" }} />
+          <span className="text-base" style={{ color: "#A8DBBA", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>B-roll</span>
+          <span className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Inter', sans-serif" }}>Sideline, fans, BTS, practice</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function StepDetails({
+  kind, roster, playerIds, setPlayerIds, brollType, setBrollType, vibe, setVibe, teamName, onBack, onSubmit, canSubmit,
+}: {
+  kind: "play" | "broll";
+  roster: RosterRow[];
+  playerIds: string[];
+  setPlayerIds: (v: string[]) => void;
+  brollType: string | null;
+  setBrollType: (v: string | null) => void;
+  vibe: string | null;
+  setVibe: (v: string | null) => void;
+  teamName: string;
+  onBack: () => void;
+  onSubmit: () => void;
+  canSubmit: boolean;
+}) {
+  const vibes = kind === "play" ? PLAY_VIBES : BROLL_VIBES;
+  const togglePlayer = (id: string) =>
+    setPlayerIds(playerIds.includes(id) ? playerIds.filter((x) => x !== id) : [...playerIds, id]);
+  return (
+    <div>
+      <StepHeader title={kind === "play" ? "Play details" : "B-roll details"} onBack={onBack} />
+
+      {kind === "broll" && (
+        <div className="px-5 pt-4">
+          <p className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Type</p>
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            {BROLL_TYPES.map((t) => {
+              const on = brollType === t;
+              return (
+                <button
+                  key={t}
+                  onClick={() => setBrollType(on ? null : t)}
+                  className="rounded-xl border-2 px-3 py-3 text-sm"
+                  style={{
+                    background: on ? "#D4A017" : "#144D2E",
+                    borderColor: on ? "#D4A017" : "#1E6B3D",
+                    color: on ? "#2C1A00" : "#A8DBBA",
+                    fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
+                  }}
+                >
+                  {t}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {kind === "play" && (
+        <div className="px-5 pt-4">
+          <p className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Tag players with significant contribution</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {roster.length === 0 && (
+              <p className="text-sm" style={{ color: "#A8DBBA" }}>No active roster yet.</p>
+            )}
+            {roster.map((p) => {
+              const on = playerIds.includes(p.id);
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => togglePlayer(p.id)}
+                  className="rounded-full border-2 px-3 py-1.5 text-xs"
+                  style={{
+                    background: on ? "#D4A017" : "#144D2E",
+                    borderColor: on ? "#D4A017" : "#1E6B3D",
+                    color: on ? "#2C1A00" : "#A8DBBA",
+                    fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
+                  }}
+                >
+                  {p.jersey_number ? `#${p.jersey_number} ` : ""}{p.player_name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      <div className="px-5 pt-5">
+        <p className="text-xs" style={{ color: "#4DBF78", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>Vibe</p>
+        <div className="mt-2 grid grid-cols-2 gap-2">
+          {vibes.map((v) => {
+            const on = vibe === v;
+            return (
+              <button
+                key={v}
+                onClick={() => setVibe(on ? null : v)}
+                className="rounded-xl border-2 px-3 py-3 text-sm"
+                style={{
+                  background: on ? "#D4A017" : "#144D2E",
+                  borderColor: on ? "#D4A017" : "#1E6B3D",
+                  color: on ? "#2C1A00" : "#A8DBBA",
+                  fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
+                }}
+              >
+                {v}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="px-5 pt-6 pb-6">
+        <PrimaryBtn onClick={onSubmit} disabled={!canSubmit}>Submit to Pool ▶</PrimaryBtn>
+        <p className="mt-3 text-center text-xs" style={{ color: "#4DBF78", fontFamily: "'Inter', sans-serif" }}>
+          Goes straight to the {teamName} pool · No account needed
+        </p>
+      </div>
     </div>
   );
 }
