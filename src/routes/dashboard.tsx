@@ -13,7 +13,7 @@ import { useAuth } from "@/lib/useAuth";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
-import { Copy, Film, Users, AlertCircle, Sparkles, LogOut, Image as ImageIcon, Bell, UserPlus, CalendarPlus, ChevronRight, Trophy, Plane, Dumbbell, PartyPopper, Gamepad2, Archive, EyeOff, Plus } from "lucide-react";
+import { Copy, Film, Users, AlertCircle, Sparkles, LogOut, Image as ImageIcon, Bell, UserPlus, CalendarPlus, ChevronRight, Trophy, Plane, Dumbbell, PartyPopper, Gamepad2, Archive, EyeOff, Plus, User, Heart, X } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 export const Route = createFileRoute("/dashboard")({
@@ -36,6 +36,7 @@ type EventRow = {
 type RosterRow = { id: string; player_name: string; jersey_number: string | null; permission_status: string; status: string; inactive_date: string | null };
 type ClipRow = { id: string; event_id: string | null; uploader_name: string | null; player_tags: string[]; content_type: string; broll_type: string | null; approval_status: string };
 type RecapRow = { id: string; status: string; social_status: string };
+type ClaimRow = { id: string; roster_player_id: string; claimer_name: string; contributor_type: string; created_at: string };
 
 const EVENT_ICON: Record<string, any> = { game: Gamepad2, tournament: Trophy, practice: Dumbbell, event: PartyPopper, travel: Plane };
 
@@ -53,6 +54,8 @@ function Dashboard() {
   const [roster, setRoster] = useState<RosterRow[]>([]);
   const [clips, setClips] = useState<ClipRow[]>([]);
   const [recap, setRecap] = useState<RecapRow | null>(null);
+  const [claims, setClaims] = useState<ClaimRow[]>([]);
+  const [seenClaimIds, setSeenClaimIds] = useState<Set<string>>(new Set());
   const [openTournaments, setOpenTournaments] = useState<Record<string, boolean>>({});
   const [addEventOpen, setAddEventOpen] = useState(false);
   const [addPlayerOpen, setAddPlayerOpen] = useState(false);
@@ -62,16 +65,33 @@ function Dashboard() {
     const { data: t } = await supabase.from("teams").select("*").eq("admin_id", uid).maybeSingle();
     if (!t) { navigate({ to: "/onboarding" }); return; }
     setTeam(t as Team);
-    const [{ data: ev }, { data: r }, { data: c }, { data: rc }] = await Promise.all([
+    const [{ data: ev }, { data: r }, { data: c }, { data: rc }, { data: cl }] = await Promise.all([
       supabase.from("schedule_events").select("*").eq("team_id", t.id).order("date"),
       supabase.from("roster").select("id,player_name,jersey_number,permission_status,status,inactive_date").eq("team_id", t.id).order("jersey_number"),
       supabase.from("clips").select("id,event_id,uploader_name,player_tags,content_type,broll_type,approval_status").eq("team_id", t.id),
       supabase.from("recaps").select("id,status,social_status").eq("team_id", t.id).maybeSingle(),
+      supabase.from("roster_claims").select("id,roster_player_id,claimer_name,contributor_type,created_at").eq("team_id", t.id).order("created_at", { ascending: false }),
     ]);
     setEvents((ev || []) as any);
     setRoster((r || []) as any);
     setClips((c || []) as any);
     setRecap((rc as any) || null);
+    const newClaims = (cl || []) as ClaimRow[];
+    if (typeof window !== "undefined") {
+      const seen = new Set<string>(JSON.parse(window.localStorage.getItem(`recap_seen_claims_${t.id}`) || "[]"));
+      const unseen = newClaims.filter((cc) => !seen.has(cc.id));
+      if (unseen.length && claims.length) {
+        unseen.slice(0, 3).forEach((u) => {
+          const player = (r || []).find((rr: any) => rr.id === u.roster_player_id);
+          const j = player?.jersey_number ? `#${player.jersey_number}` : player?.player_name ?? "Player";
+          toast.success(`${j} has been claimed by ${u.claimer_name}`);
+        });
+      }
+      const all = new Set<string>([...seen, ...newClaims.map((cc) => cc.id)]);
+      window.localStorage.setItem(`recap_seen_claims_${t.id}`, JSON.stringify(Array.from(all)));
+      setSeenClaimIds(all);
+    }
+    setClaims(newClaims);
   };
 
   useEffect(() => {
@@ -103,6 +123,11 @@ function Dashboard() {
 
   const activeRoster = roster.filter((p) => p.status === "active");
   const inactiveRoster = roster.filter((p) => p.status === "inactive");
+  const claimsByPlayer = useMemo(() => {
+    const m: Record<string, ClaimRow[]> = {};
+    claims.forEach((c) => { (m[c.roster_player_id] ||= []).push(c); });
+    return m;
+  }, [claims]);
   const noFootageCount = activeRoster.filter((p) => !playersWithFootage.has(p.player_name.toLowerCase()) && !playersWithMentions.has(p.player_name.toLowerCase())).length;
   const contributors = new Set(clips.map((c) => c.uploader_name).filter(Boolean)).size;
 
@@ -279,7 +304,7 @@ function Dashboard() {
               const hasMention = playersWithMentions.has(p.player_name.toLowerCase());
               const color = hasTagged ? "border-primary bg-primary/10" : hasMention ? "border-accent bg-accent/10" : "border-destructive bg-destructive/10";
               return (
-                <PlayerChip key={p.id} player={p} colorClass={color} onRequest={() => requestPlayerFootage(p.player_name)} onChanged={() => user && refresh(user.id)} />
+                <PlayerChip key={p.id} player={p} colorClass={color} claims={claimsByPlayer[p.id] || []} onRequest={() => requestPlayerFootage(p.player_name)} onChanged={() => user && refresh(user.id)} />
               );
             })}
             {activeRoster.length === 0 && <p className="col-span-full text-sm text-muted-foreground">No active players yet.</p>}
@@ -295,7 +320,7 @@ function Dashboard() {
               </CollapsibleTrigger>
               <CollapsibleContent className="mt-2 grid grid-cols-2 gap-2 opacity-60 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
                 {inactiveRoster.map((p) => (
-                  <PlayerChip key={p.id} player={p} colorClass="border-border bg-muted/30" onRequest={() => {}} onChanged={() => user && refresh(user.id)} />
+                  <PlayerChip key={p.id} player={p} colorClass="border-border bg-muted/30" claims={claimsByPlayer[p.id] || []} onRequest={() => {}} onChanged={() => user && refresh(user.id)} />
                 ))}
               </CollapsibleContent>
             </Collapsible>
@@ -449,7 +474,7 @@ function AddEventDialog({ open, onOpenChange, teamId, tournaments, onAdded }: { 
   );
 }
 
-function PlayerChip({ player, colorClass, onRequest, onChanged }: { player: RosterRow; colorClass: string; onRequest: () => void; onChanged: () => void }) {
+function PlayerChip({ player, colorClass, claims, onRequest, onChanged }: { player: RosterRow; colorClass: string; claims: ClaimRow[]; onRequest: () => void; onChanged: () => void }) {
   const setStatus = async (status: string) => {
     const patch: any = { status };
     if (status === "inactive") patch.inactive_date = new Date().toISOString().slice(0, 10);
@@ -457,16 +482,43 @@ function PlayerChip({ player, colorClass, onRequest, onChanged }: { player: Rost
     toast.success(`${player.player_name} → ${status}`);
     onChanged();
   };
+  const removeClaim = async (claimId: string, claimerName: string) => {
+    await supabase.from("roster_claims").delete().eq("id", claimId);
+    toast.success(`Removed claim from ${claimerName}`);
+    onChanged();
+  };
+  const hasPlayer = claims.some((c) => c.contributor_type === "player");
+  const hasParent = claims.some((c) => c.contributor_type === "parent");
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className={`flex items-center justify-between rounded-lg border-2 px-3 py-2 text-left text-sm hover:opacity-80 ${colorClass}`}>
+        <button className={`flex items-center justify-between gap-2 rounded-lg border-2 px-3 py-2 text-left text-sm hover:opacity-80 ${colorClass}`}>
           <span className="truncate font-medium">{player.player_name}</span>
-          {player.jersey_number && <span className="ml-2 text-xs text-muted-foreground">#{player.jersey_number}</span>}
+          <span className="flex items-center gap-1">
+            {hasPlayer && <User className="h-3 w-3 text-primary" aria-label="Claimed by player" />}
+            {hasParent && <Heart className="h-3 w-3 text-accent-foreground" aria-label="Claimed by parent" />}
+            {player.jersey_number && <span className="text-xs text-muted-foreground">#{player.jersey_number}</span>}
+          </span>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
         <DropdownMenuItem onClick={onRequest}><UserPlus className="mr-2 h-4 w-4" />Request footage</DropdownMenuItem>
+        {claims.length > 0 && (
+          <>
+            <div className="border-t my-1" />
+            <div className="px-2 py-1 text-[10px] uppercase tracking-wide text-muted-foreground">Claimed by</div>
+            {claims.map((c) => (
+              <DropdownMenuItem key={c.id} onSelect={(e) => e.preventDefault()} className="justify-between gap-2">
+                <span className="flex items-center gap-2">
+                  {c.contributor_type === "player" ? <User className="h-3 w-3" /> : c.contributor_type === "parent" ? <Heart className="h-3 w-3" /> : null}
+                  <span className="text-xs">{c.claimer_name}</span>
+                </span>
+                <button onClick={() => removeClaim(c.id, c.claimer_name)} className="text-muted-foreground hover:text-destructive"><X className="h-3 w-3" /></button>
+              </DropdownMenuItem>
+            ))}
+            <div className="border-t my-1" />
+          </>
+        )}
         {player.status !== "active" && <DropdownMenuItem onClick={() => setStatus("active")}>Set active</DropdownMenuItem>}
         {player.status !== "inactive" && <DropdownMenuItem onClick={() => setStatus("inactive")}><EyeOff className="mr-2 h-4 w-4" />Mark inactive</DropdownMenuItem>}
         {player.status !== "archived" && <DropdownMenuItem onClick={() => setStatus("archived")}><Archive className="mr-2 h-4 w-4" />Archive</DropdownMenuItem>}
