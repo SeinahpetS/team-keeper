@@ -64,7 +64,7 @@ function Index() {
               </span>
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
-              Recap turns the clips trapped in everyone's camera roll into a season highlight video your whole team will love.
+              Keeper turns the clips trapped in everyone's camera roll into a season highlight video your whole team will love.
             </p>
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
               {[
