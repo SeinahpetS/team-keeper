@@ -443,22 +443,60 @@ function StatCard({ label, value }: { icon?: any; label: string; value: any; acc
   );
 }
 
-function ScoreboardStat({ label, value }: { label: string; value: number | string }) {
+function ScoreboardPanel({ teamName, season, clips, games, players }: { teamName: string; season: number; clips: number; games: number; players: number }) {
+  const night = useIsNight();
+  const { dotRadius, gap } = useDotSize();
+  const palette = night
+    ? { outer: "#0D3320", bar: "#0A1A0F", display: "#060F08", offOuter: "#0D2018", offInner: "#112516", header: `KEEPER · ${teamName.toUpperCase()}` }
+    : { outer: "#EDF7F0", bar: "#144D2E", display: "#0F2E1A", offOuter: "#1A4A2A", offInner: "#1E5530", header: "HOME TEAM" };
+  const labelStyle = {
+    color: "#4DBF78",
+    fontFamily: "'Barlow Condensed', sans-serif",
+    fontWeight: 700,
+    letterSpacing: "0.1em",
+    textTransform: "uppercase" as const,
+    fontSize: "11px",
+  };
+  const headerStyle = { ...labelStyle, fontSize: "10px" };
+  const Display = ({ value, big = false }: { value: number; big?: boolean }) => (
+    <div
+      className="flex items-center justify-center rounded-md"
+      style={{ background: palette.display, border: "1.5px solid #1E6B3D", padding: big ? "14px 18px" : "10px 14px" }}
+    >
+      <DotMatrixNumber
+        value={value}
+        dotRadius={big ? dotRadius + 1 : dotRadius}
+        gap={big ? gap + 2 : gap}
+        offOuter={palette.offOuter}
+        offInner={palette.offInner}
+      />
+    </div>
+  );
   return (
-    <div className="flex flex-col items-center gap-3 py-2">
-      <DotMatrixNumber value={value} />
-      <span
-        className="text-xs"
-        style={{
-          color: "#4DBF78",
-          fontFamily: "'Barlow Condensed', sans-serif",
-          fontWeight: 700,
-          letterSpacing: "0.1em",
-          textTransform: "uppercase",
-        }}
-      >
-        {label}
-      </span>
+    <div className="rounded-xl p-3" style={{ background: palette.outer }}>
+      <div className="rounded-lg p-4" style={{ background: palette.bar }}>
+        <div className="mb-3 text-center" style={headerStyle}>{palette.header}</div>
+        <div className="grid items-end gap-4" style={{ gridTemplateColumns: "1fr auto 1fr" }}>
+          <div className="flex flex-col items-center gap-2">
+            <Display value={clips} />
+            <span style={labelStyle}>Clips</span>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <span
+              className="rounded-full px-3 py-0.5"
+              style={{ border: "1px solid #D4A017", background: palette.display, color: "#D4A017", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", fontSize: "10px" }}
+            >
+              Season {season}
+            </span>
+            <Display value={games} big />
+            <span style={labelStyle}>Games</span>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <Display value={players} />
+            <span style={labelStyle}>Players</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
