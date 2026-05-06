@@ -428,58 +428,137 @@ function StatCard({ label, value }: { icon?: any; label: string; value: any; acc
 }
 
 function ScoreboardPanel({ teamName, season, clips, games, players }: { teamName: string; season: number; clips: number; games: number; players: number }) {
-  const night = useIsNight();
-  const palette = night
-    ? { outer: "#0D3320", bar: "#0A1A0F", display: "#060F08", offOuter: "#0D2018", offInner: "#112516", header: `KEEPER · ${teamName.toUpperCase()}` }
-    : { outer: "#EDF7F0", bar: "#144D2E", display: "#0F2E1A", offOuter: "#1A4A2A", offInner: "#1E5530", header: "HOME TEAM" };
+function ScoreboardPanel({ teamName, season, clips, games, players }: { teamName: string; season: number; clips: number; games: number; players: number }) {
   const labelStyle = {
     color: "#4DBF78",
     fontFamily: "'Barlow Condensed', sans-serif",
     fontWeight: 700,
-    letterSpacing: "0.1em",
+    letterSpacing: "0.14em",
     textTransform: "uppercase" as const,
     fontSize: "11px",
+    textAlign: "center" as const,
   };
-  const headerStyle = { ...labelStyle, fontSize: "10px" };
-  const Display = ({ value, big = false }: { value: number; big?: boolean }) => (
-    <div
-      className="display-panel flex items-center justify-center rounded-md"
-      style={{ background: palette.display, border: "1.5px solid #1E6B3D", padding: big ? "14px 18px" : "10px 14px", overflow: "hidden", minWidth: 0 }}
-    >
-      <DotMatrixNumber
-        value={value}
-        dotRadius={big ? 6 : 5}
-        gap={big ? 13 : 11}
-        offOuter={palette.offOuter}
-        offInner={palette.offInner}
-      />
+  const headerStyle = {
+    color: "#4DBF78",
+    fontFamily: "'Barlow Condensed', sans-serif",
+    fontWeight: 700,
+    letterSpacing: "0.12em",
+    textTransform: "uppercase" as const,
+    fontSize: "11px",
+    textAlign: "center" as const,
+  };
+  // Three fixed renders per stat — one per breakpoint, toggled via CSS visibility.
+  const Dot = ({ value, r, g }: { value: number; r: number; g: number }) => (
+    <DotMatrixNumber
+      value={value}
+      dotRadius={r}
+      gap={g}
+      unlitRadius={r}
+      offOuter="#0D2018"
+      offInner="#112516"
+      minDigits={3}
+    />
+  );
+  const StatPanel = ({ value, label }: { value: number; label: string }) => (
+    <div className="sb-panel sb-bordered">
+      <div className="sb-mobile"><Dot value={value} r={2.5} g={6} /></div>
+      <div className="sb-tablet"><Dot value={value} r={3.5} g={8} /></div>
+      <div className="sb-desktop"><Dot value={value} r={4.5} g={10.5} /></div>
+      <div className="sb-label" style={labelStyle}>{label}</div>
     </div>
   );
+  const seasonPill = (
+    <span
+      className="sb-season-pill"
+      style={{
+        background: "#060F08",
+        border: "1.5px solid #D4A017",
+        borderRadius: "5px",
+        padding: "4px 10px",
+        color: "#D4A017",
+        fontFamily: "'Barlow Condensed', sans-serif",
+        fontWeight: 700,
+        letterSpacing: "0.12em",
+        textTransform: "uppercase",
+        fontSize: "12px",
+        display: "inline-block",
+      }}
+    >
+      Fall {season}
+    </span>
+  );
   return (
-    <div className="rounded-xl p-3" style={{ background: palette.outer }}>
-      <div className="rounded-lg p-4" style={{ background: palette.bar }}>
-        <div className="mb-3 text-center" style={headerStyle}>{palette.header}</div>
-        <div className="grid items-end gap-4" style={{ gridTemplateColumns: "1fr auto 1fr" }}>
-          <div className="flex flex-col items-center gap-2">
-            <Display value={clips} />
-            <span style={labelStyle}>Clips</span>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <span
-              className="rounded-full px-3 py-0.5"
-              style={{ border: "1px solid #D4A017", background: palette.display, color: "#D4A017", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", fontSize: "10px" }}
-            >
-              Season {season}
-            </span>
-            <Display value={games} big />
-            <span style={labelStyle}>Games</span>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <Display value={players} />
-            <span style={labelStyle}>Players</span>
-          </div>
-        </div>
+    <div
+      className="sb-bar"
+      style={{ background: "#0A1A0F", borderRadius: "12px", padding: "16px" }}
+    >
+      <div className="sb-header" style={headerStyle}>
+        KEEPER · {teamName.toUpperCase()}
       </div>
+      <div className="sb-row">
+        <StatPanel value={clips} label="Clips" />
+        <div className="sb-panel sb-games">
+          <div className="sb-season">
+            {seasonPill}
+            <div style={{ ...labelStyle, fontSize: "9px", marginTop: "2px" }}>Season</div>
+          </div>
+          <div className="sb-mobile"><Dot value={games} r={2.5} g={6} /></div>
+          <div className="sb-tablet"><Dot value={games} r={5} g={11.5} /></div>
+          <div className="sb-desktop"><Dot value={games} r={6.5} g={15} /></div>
+          <div className="sb-label" style={labelStyle}>Games</div>
+        </div>
+        <StatPanel value={players} label="Players" />
+      </div>
+
+      <style>{`
+        .sb-header { margin-bottom: 12px; }
+        .sb-mobile, .sb-tablet, .sb-desktop { display: none; }
+        .sb-panel {
+          display: inline-flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 6px;
+        }
+        .sb-bordered {
+          background: #060F08;
+          border: 1.5px solid #1E6B3D;
+          border-radius: 6px;
+        }
+        .sb-label { margin-top: 4px; }
+        .sb-season { display: flex; flex-direction: column; align-items: center; margin-bottom: 6px; }
+
+        /* Mobile <640 */
+        @media (max-width: 639px) {
+          .sb-mobile { display: block; }
+          .sb-row {
+            display: flex; flex-wrap: wrap;
+            justify-content: center; gap: 10px;
+          }
+          .sb-bordered { padding: 10px 12px 8px; }
+          .sb-games { padding: 10px 12px 8px; background: transparent; border: none; }
+          .sb-season { display: none; }
+        }
+        /* Tablet 640-1023 */
+        @media (min-width: 640px) and (max-width: 1023px) {
+          .sb-tablet { display: block; }
+          .sb-row {
+            display: flex; justify-content: center; align-items: stretch;
+            gap: 16px;
+          }
+          .sb-bordered { padding: 14px 18px 12px; align-self: stretch; justify-content: center; }
+          .sb-games { background: transparent; border: none; padding: 0; }
+        }
+        /* Desktop >=1024 */
+        @media (min-width: 1024px) {
+          .sb-desktop { display: block; }
+          .sb-row {
+            display: flex; justify-content: center; align-items: stretch;
+            gap: 24px;
+          }
+          .sb-bordered { padding: 18px 22px 14px; align-self: stretch; justify-content: center; }
+          .sb-games { background: transparent; border: none; padding: 0; }
+        }
+      `}</style>
     </div>
   );
 }
