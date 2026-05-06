@@ -11,6 +11,7 @@ export function KeeperWordmark({ size = "md" }: { size?: Size }) {
   const style = SIZES[size];
   return (
     <span
+      className="keeper-wordmark"
       style={{
         fontFamily: "'Barlow Condensed', sans-serif",
         fontWeight: 700,
@@ -18,8 +19,8 @@ export function KeeperWordmark({ size = "md" }: { size?: Size }) {
         ...style,
       }}
     >
-      <span style={{ color: "#4DBF78" }}>Keep</span>
-      <span style={{ color: "#D4A017" }}>er</span>
+      <span className="keeper-wordmark__keep">Keep</span>
+      <span className="keeper-wordmark__er" style={{ color: "#D4A017" }}>er</span>
     </span>
   );
 }
