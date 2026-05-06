@@ -1,0 +1,1 @@
+ALTER TABLE public.teams ADD COLUMN IF NOT EXISTS compile_locked boolean NOT NULL DEFAULT false;
