@@ -55,7 +55,7 @@ export function DotMatrixNumber({
   const W = totalCols * G + R * 2;
   const H = ROWS * G + R * 2;
 
-  const circles: JSX.Element[] = [];
+  const circles: React.ReactElement[] = [];
   let cx = 0;
   segs.forEach((seg, segIdx) => {
     seg.p.forEach((row, ri) => {
