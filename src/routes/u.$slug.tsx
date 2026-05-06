@@ -458,9 +458,6 @@ function ContributorUpload() {
               </div>
               <span className="text-xl" style={{ color: "var(--color-accent)" }}>Keeper</span>
             </div>
-            <span className="rounded-full px-3 py-1 text-[10px]" style={{ background: "var(--color-secondary)", color: "var(--color-accent)", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase", border: "1px solid var(--color-border)" }}>
-              {night ? "Night game" : "Day game"}
-            </span>
           </div>
           <Card className="mt-4 border p-4" style={{ background: "var(--color-secondary)", borderColor: "var(--color-border)" }}>
             <p className="text-xs" style={{ color: "var(--color-muted-foreground)", fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: "0.1em", textTransform: "uppercase" }}>Team</p>
