@@ -28,7 +28,7 @@ function Onboarding() {
   const [permissionsSent, setPermissionsSent] = useState(false);
   const [createdTeam, setCreatedTeam] = useState<{ id: string; upload_slug: string } | null>(null);
   const [busy, setBusy] = useState(false);
-  const TOTAL_STEPS = 6;
+  const TOTAL_STEPS = 5;
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/" });
