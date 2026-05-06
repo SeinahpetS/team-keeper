@@ -228,10 +228,10 @@ function Dashboard() {
 
         {/* Scoreboard panel */}
         <ScoreboardPanel
-          teamName={team.name}
+          teamName="Home Team"
           season={team.season_year}
           clips={clips.length}
-          games={events.filter((e) => e.event_type === "game").length}
+          contributors={contributors}
           players={activeRoster.length}
         />
 
@@ -427,7 +427,7 @@ function StatCard({ label, value }: { icon?: any; label: string; value: any; acc
   );
 }
 
-function ScoreboardPanel({ teamName, season, clips, games, players }: { teamName: string; season: number; clips: number; games: number; players: number }) {
+function ScoreboardPanel({ teamName, season, clips, contributors, players }: { teamName: string; season: number; clips: number; contributors: number; players: number }) {
   const labelStyle = {
     color: "#4DBF78",
     fontFamily: "'Barlow Condensed', sans-serif",
@@ -501,10 +501,10 @@ function ScoreboardPanel({ teamName, season, clips, games, players }: { teamName
             {seasonPill}
             <div style={{ ...labelStyle, fontSize: "9px", marginTop: "2px" }}>Season</div>
           </div>
-          <div className="sb-mobile"><Dot value={games} r={2.5} g={6} /></div>
-          <div className="sb-tablet"><Dot value={games} r={5} g={11.5} /></div>
-          <div className="sb-desktop"><Dot value={games} r={6.5} g={15} /></div>
-          <div className="sb-label" style={labelStyle}>Games</div>
+          <div className="sb-mobile"><Dot value={contributors} r={2.5} g={6} /></div>
+          <div className="sb-tablet"><Dot value={contributors} r={5} g={11.5} /></div>
+          <div className="sb-desktop"><Dot value={contributors} r={6.5} g={15} /></div>
+          <div className="sb-label" style={labelStyle}>Contributors</div>
         </div>
         <StatPanel value={players} label="Players" />
       </div>
